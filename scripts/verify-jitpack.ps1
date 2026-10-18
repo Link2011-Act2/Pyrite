@@ -61,7 +61,7 @@ Push-Location -LiteralPath $consumerRoot
 try {
     & .\gradlew.bat clean :app:assembleDebug :app:dependencies --configuration debugRuntimeClasspath `
         "-Ppyrite.repository=$repository" "-Ppyrite.coordinate=$coordinate" '-Ppyrite.pomOnly=true' `
-        --no-build-cache --refresh-dependencies --console=plain |
+        --no-build-cache --refresh-dependencies --console=plain 2>&1 |
         Tee-Object -FilePath (Join-Path $checkRoot "jitpack-consumer-$mode.txt")
     if ($LASTEXITCODE -ne 0) { throw "The $mode consumer failed: $coordinate" }
     Write-Output "Verified $mode Maven POM consumer: $coordinate from $repository"

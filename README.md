@@ -88,7 +88,7 @@ AARファイルだけをコピーする方法では推移依存情報が失わ�
 
 `jitpack.yml`でJDK 21・SDK 37と既存のMaven Publishを使用する構成を用意しています。想定座標は`com.github.Link2011-Act2:Pyrite:<revision>`です。公開対象はライブラリAAR一つです。
 
-**JitPack実サーバーからの取得は未検証です。** 設定を含むcommitのGitHub反映と、JitPackからのソースへのアクセスが必要です。タグ・GitHub Release・公開範囲の変更は行っていません。
+**JitPack実サーバーからの取得成功は未確認です。** 設定commit `04d2c84` はmasterへ反映済みで、GitHubのPublic設定とcommitの匿名取得を確認しました。JitPackはまだHTTP 401を返しており、公式FAQに記載された非公開判定の1時間キャッシュの影響が考えられます。キャッシュ更新後に再検証します。タグ・GitHub Releaseは作成していません。
 
 ```powershell
 # 専用ローカルMavenでJitPack座標とPOMの推移依存を検証

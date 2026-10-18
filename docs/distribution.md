@@ -67,7 +67,7 @@ Composeの有効化、対応するCompose Compiler plugin、SDK要件はREADME�
 
 設定を含むcommitがGitHubへ反映され、JitPackからソースを取得できる必要があります。タグやGitHub Releaseは必須ではなく、commit SHAによる検証も公式に対応しています。安定した配布版のタグは当面`0.x.x`とし、承認後に作成します。
 
-2026-10-18時点では認証なしのGitHub APIが対象リポジトリに404を返したため、匿名での公開利用を確認できていません。リポジトリの可視性やJitPackのアクセス設定は変更していません。ユーザーの選択により、ソースとAARをともに公開する方針です。GitHubの公開設定を確認し、認証なしで参照可能にしてから実取得を検証します。認証情報はコミットしないでください。
+2026-10-18、ユーザーがGitHubをPublicへ変更した後、認証なしGitHub APIで`private: false`・`visibility: public`とcommit `04d2c84`の取得を確認しました。ソースとAARをともに公開する方針です。認証情報は不要で、コミットもしないでください。
 
 ## 公式資料
 
@@ -75,3 +75,5 @@ Composeの有効化、対応するCompose Compiler plugin、SDK要件はREADME�
 - [Android LibraryのMaven Publish](https://docs.jitpack.io/android/)
 - [commit SHAでの利用](https://docs.jitpack.io/)
 - [公開範囲・認証に関するFAQ](https://docs.jitpack.io/faq/)
+
+masterへの反映はcommit `04d2c84`で完了しました。Public変更後もJitPack APIと同commitのPOM取得はHTTP 401で「Repo not found or no token provided」を返しました。公式FAQでは非公開判定を1時間キャッシュすると説明されています。現在はこのキャッシュ更新待ちと考えられます。GitHub側の公開設定は確認済みで、JitPackへの認証情報追加や依存バージョン変更は行いません。キャッシュ更新後に同じ固定commitで取得・consumerビルドを再試行します。

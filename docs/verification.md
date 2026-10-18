@@ -91,8 +91,14 @@ Maven発行版のカタログで追加のAndroid UIテスト2件が成功しま�
 - シェル構文チェック成功、Gradle wrapperはindex・作業ファイルともLF。実行権限に依存せず`sh gradlew`で呼び出す設定。
 - 切り替え後も通常の`scripts/verify-published.ps1`が全段階成功。通常座標`jp.linkserver:pyrite:0.1.0-SNAPSHOT`を維持。
 
-JitPack実サーバーでのビルドとリモート取得は未検証です。GitHubの既定ブランチはb11a607で、今回の設定はまだ作業ツリーにあります。認証なしGitHub APIへの問い合わせは404でした。公開範囲・JitPackアクセスの確認と設定commitの反映後、固定commit SHAでリモートモードを実行する必要があります。タグ・GitHub Releaseは作成していません。
+JitPack実サーバーでのビルドとリモート取得は未検証です。ユーザーの承認により、設定commit 04d2c849d9bc962c6686b197fa574f8541ae1e52をmasterへFast-forwardし、通常Pushしました。リモートmasterのcommit一致を確認しています。同commitで独立consumerのリモートモードを実行しましたが、JitPackのPOM取得がHTTP 401 Unauthorizedで失敗しました。JitPack APIも「Repo not found or no token provided」を返し、認証なしGitHub APIは引き続き404でした。Gradleのconfiguration cache保存エラーはこの依存解決失敗に伴うものです。依存バージョンは変更していません。GitHubの公開設定を確認後、再検証が必要です。タグ・GitHub Releaseは作成していません。
 
 既存の成功済みJVM・UI全件テストは再実行していません。今回は配布設定と検証手順のみを変更し、製品のCompose実装・公開API・依存バージョンは変更していません。Phase 3・4の新たな調査には未着手です。
 
 配布方針はユーザー確認により「ソースとAARを公開する」に確定しました。GitHubの公開設定は未変更です。既存3アプリのGit状態も調査開始時と一致していることを再確認しました。
+
+### Public変更後の確認（2026-10-18 15:36 JST）
+
+ユーザーによるPublic変更後、認証なしのGitHub APIでprivate: false・visibility: publicとcommit 04d2c849d9bc962c6686b197fa574f8541ae1e52の取得を確認しました。JitPack APIとPOMは引き続きHTTP 401を返しています。公式FAQの非公開判定1時間キャッシュの影響が考えられるため、更新後に再試行します。GitHub側の追加設定を求める段階ではありません。
+
+https://docs.jitpack.io/faq/ の「Change my repository to public but still got the message No access token」を参照。Phase 3・4は引き続き未着手です。
