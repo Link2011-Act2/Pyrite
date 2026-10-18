@@ -3,4 +3,4 @@ jdk:
 before_install:
   - sh scripts/jitpack-prepare.sh
 install:
-  - sh gradlew :pyrite:publishReleasePublicationToMavenLocal --no-daemon --console=plain
+  - sh gradlew :pyrite:publishReleasePublicationToMavenLocal --no-daemon --console=plain --info --stacktrace
