@@ -1,4 +1,4 @@
-# Pyrite
+# Project Pyrite
 
 複数のAndroidアプリで共通利用する、Jetpack Composeの設定画面・About画面ライブラリです。
 
