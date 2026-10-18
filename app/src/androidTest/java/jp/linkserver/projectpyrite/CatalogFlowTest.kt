@@ -25,9 +25,11 @@ class CatalogFlowTest {
         pressBack()
         compose.onNodeWithText(text(R.string.notifications)).performScrollTo().assertIsOff()
         compose.onNodeWithContentDescription(text(R.string.components)).performClick()
+        compose.onNodeWithText(text(R.string.catalog_official)).performScrollTo().performClick()
         compose.onNodeWithText(text(R.string.buttons)).performScrollTo().assertIsDisplayed()
         compose.onNodeWithText(text(R.string.expand)).performScrollTo().performClick()
         compose.onNodeWithText(text(R.string.expansion_body)).assertExists()
+        pressBack()
         pressBack()
         compose.onNodeWithText(text(R.string.design_style)).performScrollTo().assertIsDisplayed()
     }
@@ -52,6 +54,57 @@ class CatalogFlowTest {
                 compose.onNodeWithContentDescription(text(R.string.back)).performClick()
             }
         }
+    }
+
+    @Test fun categoryStateSurvivesNavigationThemeAndActivityRecreation() {
+        compose.onNodeWithContentDescription(text(R.string.components)).performClick()
+        compose.onNodeWithText(text(R.string.catalog_cards)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.check_now)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.loading_preview)).performScrollTo().performClick()
+        compose.onNode(hasText(text(R.string.checking)) and hasClickAction()).performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithContentDescription(text(R.string.design_style)).performClick()
+        compose.onNode(hasText(text(R.string.nothing_style)) and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText(text(R.string.apply)).performClick()
+        compose.onNodeWithText(text(R.string.loading_preview)).performScrollTo().assertIsOn()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithText(text(R.string.loading_preview)).performScrollTo().assertIsOn()
+        compose.onNodeWithText(text(R.string.loading_preview)).performClick()
+        compose.onNodeWithText(text(R.string.check_now)).performScrollTo().assertIsEnabled()
+        compose.onNodeWithText(compose.activity.resources.getQuantityString(R.plurals.counter_value, 1, 1))
+            .assertExists()
+        pressBack()
+        compose.onNodeWithText(text(R.string.catalog_rows)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.rich_switch)).performScrollTo().performClick().assertIsOn()
+        pressBack()
+        compose.onNodeWithText(text(R.string.catalog_cards)).performScrollTo().performClick()
+        compose.onNodeWithText(compose.activity.resources.getQuantityString(R.plurals.counter_value, 1, 1))
+            .performScrollTo().assertIsDisplayed()
+        pressBack()
+        compose.onNodeWithText(text(R.string.catalog_rows)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.rich_switch)).performScrollTo().assertIsOn()
+    }
+
+    @Test fun confirmationAndConditionalScreenKeepDraftAndCommittedValuesSeparate() {
+        compose.onNodeWithContentDescription(text(R.string.components)).performClick()
+        compose.onNodeWithText(text(R.string.catalog_dialogs)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.open_confirmation)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.confirm)).assertIsNotEnabled()
+        compose.onNodeWithText(text(R.string.acknowledged)).performClick()
+        compose.onNodeWithText(text(R.string.cancel)).performClick()
+        compose.onNodeWithText(compose.activity.resources.getQuantityString(R.plurals.confirmation_count, 0, 0)).assertExists()
+        compose.onNodeWithText(text(R.string.open_confirmation)).performClick()
+        compose.onNodeWithText(text(R.string.acknowledged)).performClick()
+        compose.onNodeWithText(text(R.string.confirm)).performClick()
+        compose.onNodeWithText(compose.activity.resources.getQuantityString(R.plurals.confirmation_count, 1, 1)).assertExists()
+        pressBack()
+        compose.onNodeWithText(text(R.string.catalog_screens)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.show_advanced)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.guarded_change)).performScrollTo().performClick()
+        compose.onNodeWithText(text(R.string.cancel)).performClick()
+        compose.onNodeWithText(text(R.string.guarded_change)).assertIsOff().performClick()
+        compose.onNodeWithText(text(R.string.confirm)).performClick()
+        compose.onNodeWithText(text(R.string.guarded_change)).assertIsOn()
+        compose.onNodeWithText(text(R.string.guarded_change)).performClick().assertIsOff()
     }
 
     private fun choose(title: Int, label: String) {

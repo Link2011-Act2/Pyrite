@@ -2,7 +2,7 @@
 複数のAndroidアプリで共通利用する、Jetpack Composeの設定画面・About画面ライブラリです。
 
 - Android Library `:pyrite`：状態を外部から渡す設定UIとAbout表示。
-- サンプル `:app`：M3 / M3 Expressive / Nothing風、ライト・ダーク、文字拡大、画面遷移。
+- UI検証カタログ `:app`：部品別の操作例、画面プレビュー、3スタイル、明暗、文字拡大と狭幅。
 - 独立した利用検証プロジェクト `verification/consumer`：発行済みMavenアーティファクトのみを参照。
 
 Material 3の基本部品は直接利用してください。Pyriteは、設定行の操作・グループ構造・About構成など、アプリをまたぐ価値のある組み合わせを提供します。
@@ -105,6 +105,8 @@ maven {
 implementation("com.github.Link2011-Act2:Pyrite:4244bed7b36aa084c89d14338f176dbf87c0f263")
 ```
 
+このSHAは初期APIの配布検証版です。今回追加したカード・状態行・操作付きモザイクには新しい固定SHAが必要です。現在の追加APIはソース／ローカルMaven版で検証してください。
+
 利用アプリ側でPyriteのソースを取得する必要はありません。SDK・Compose Compilerの要件は上記を参照してください。
 
 ```powershell
@@ -184,6 +186,43 @@ SettingsChoiceDialog(
 
 ダイアログを開くたびに呼び出し側でdraftを初期化してください。ライブラリは値を保存せず、取消時にアプリの値を巻き戻す処理も行いません。
 
+## 補足情報・状態・アクション
+
+以下の追加APIと標準Aboutモザイクは現在のソース／ローカルMaven版です。上記のJitPack検証済みSHAにはまだ含まれません。利用アプリへの導入は新しい固定SHAの公開・取得確認後に行います。
+
+```kotlin
+SettingsSwitchItem(
+    title = "自動維持",
+    checked = enabled,
+    onCheckedChange = onEnabledChange,
+    supportingContent = {
+        Column {
+            Text("設定と実際の稼働状態を別々に表示します")
+            Text(if (armed) "稼働中" else "一時停止中")
+        }
+    }
+)
+SettingsStatusItem("更新", status = statusText, loading = checking)
+
+SettingsActionCard(
+    title = "更新を確認",
+    description = "処理と結果はアプリが管理します",
+    actionLabel = if (checking) "確認中…" else "今すぐ確認",
+    onAction = onCheck,
+    loading = checking
+)
+```
+
+カードのimportは `jp.linkserver.pyrite.card.*` です。SettingsInfoItemは操作のない情報、SettingsInfoCardは説明と追加contentを表示します。Action/Switch/Radio行には既存のString summary版を維持し、補足Composable用のoverloadを追加しています。補足slotに親と競合する操作対象を入れないでください。
+
+`AboutOverviewMosaic(info, onVersionClick = …, onDetailClick = …)` でバージョン・補足カードの操作をホストに委譲できます。通常のAboutOverviewも同じ標準モザイクを表示します。
+
+## UI検証アプリ
+
+既存の :app は、設定行／カード／ダイアログ／Aboutモザイク／画面プレビュー／公式コントロールを操作できるカタログです。カテゴリ内の右上でテーマ・明暗を切り替え、最初の設定画面で150%文字・360dp幅を選べます。状態は画面移動・テーマ切替・Activity再生成後も保持します。
+
+Pyriteが形状・余白・文字階層を管理します。アプリ別の意匠指定を増やさず、移行先は標準デザインに統一します。検証条件と全公開UIの対応表は [カタログガイド](docs/catalog.md)、ShutUpの振る舞いを保つ手順は [移行計画](docs/shutup-migration-plan.md) を参照してください。
+
 ## About画面
 
 ```kotlin
@@ -219,7 +258,7 @@ AboutScreen(
 M3Eは公式`MaterialExpressiveTheme`、`MotionScheme`、`SegmentedListItem`、`ListItemDefaults.segmentedShapes`を使用します。通常M3も公式の操作可能な`ListItem`を使用します。Nothing風では白黒・赤、22dp/6dpの連結角丸、密なカード配置を維持します。
 
 - `darkTheme`の明示指定とダイナミックカラーに対応します。Nothing風ではダイナミックカラーを使用しません。
-- `colorScheme`、`typography`、`shapes`を外部指定できます。
+- 既存の`colorScheme`、`typography`、`shapes`指定は互換性のため維持します。今後の移行はPyrite標準値を使います。
 - `nothingFontFamily`でホストが許諾を得た書体を指定できます。専有フォントは同梱していません。
 - 設定値・テーマ選択はホストで保持します。テーマの変更でライブラリが設定を初期化することはありません。
 - 固定の行高に依存せず、文言を折り返します。Aboutは狭幅・大きい文字で縦並びに切り替わります。
@@ -233,9 +272,10 @@ TalkBackによる読み上げ全体と多様な端末・フォントでの確認
 | パッケージ | API |
 | --- | --- |
 | `theme` | `PyriteStyle`, `PyriteTheme` |
-| `settings` | `SettingsScreen`, `SettingsGroup`, `SettingsGroupScope.item`, `SettingsActionItem`, `SettingsSwitchItem`, `SettingsRadioItem` |
+| `settings` | `SettingsScreen`, `SettingsGroup`, `SettingsGroupScope.item`, `SettingsActionItem`, `SettingsSwitchItem`, `SettingsRadioItem`, `SettingsInfoItem`, `SettingsStatusItem` |
+| `card` | `SettingsInfoCard`, `SettingsActionCard` |
 | `dialog` | `SettingsChoice<T>`, `SettingsChoiceDialog<T>` |
-| `about` | `AboutInfo`, `AboutDetail`, `AboutLink`, `AboutScreen`, `AboutOverview` |
+| `about` | `AboutInfo`, `AboutDetail`, `AboutLink`, `AboutScreen`, `AboutOverview`, `AboutOverviewMosaic` |
 
 通常のButton、Card、Slider、Switch、LoadingIndicator等を再公開する独自ラッパーは用意していません。
 
@@ -256,7 +296,7 @@ Glyph Barty、NITTC Scheduler、ShutUpは参照のみで、変更していませ
 
 1. 設定の数値・文字・時刻編集、検証・エラー表示。
 2. 遷移とSwitchが独立した複合設定行、展開可能な設定セクション。
-3. データ外部指定のOSS一覧、汎用アクション・状態カード。
+3. データ外部指定のOSS一覧。アクション・状態カードは実装済みです。
 4. 公式FABメニュー・ツールバーとの接続例、状態モーフの薄い構成。
 5. Markdownなど追加依存が必要な表示の採否。
 

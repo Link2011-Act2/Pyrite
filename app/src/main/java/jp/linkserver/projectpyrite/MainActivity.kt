@@ -20,6 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -53,9 +56,12 @@ internal fun PyriteCatalog() {
     var colorMode by rememberSaveable { mutableStateOf(ColorMode.System) }
     var dynamicColor by rememberSaveable { mutableStateOf(false) }
     var largeText by rememberSaveable { mutableStateOf(false) }
+    var narrow by rememberSaveable { mutableStateOf(false) }
+    val pageStates = rememberSaveableStateHolder()
     var notifications by rememberSaveable { mutableStateOf(true) }
     var optionalRow by rememberSaveable { mutableStateOf(true) }
     var clicks by rememberSaveable { mutableIntStateOf(0) }
+    var aboutFromComponents by rememberSaveable { mutableStateOf(false) }
     var page by rememberSaveable { mutableStateOf(Page.Settings) }
     var showStylePicker by rememberSaveable { mutableStateOf(false) }
     var draftStyle by rememberSaveable { mutableStateOf(style) }
@@ -78,146 +84,163 @@ internal fun PyriteCatalog() {
             }
         }
     }
-    BackHandler(page != Page.Settings) { page = Page.Settings }
+    val leaveAbout = { page = if (aboutFromComponents) Page.Components else Page.Settings }
+    BackHandler(page != Page.Settings) {
+        if (page == Page.About) leaveAbout() else page = Page.Settings
+    }
 
     CompositionLocalProvider(
         LocalDensity provides Density(density.density, density.fontScale * if (largeText) 1.5f else 1f)
     ) {
         PyriteTheme(style = style, darkTheme = dark, dynamicColor = dynamicColor) {
-            AnimatedContent(
-                targetState = page,
-                transitionSpec = { fadeIn(tween(160)) togetherWith fadeOut(tween(100)) },
-                label = "Catalog navigation"
-            ) { currentPage ->
-                when (currentPage) {
-                    Page.Settings -> SettingsScreen(
-                        title = stringResource(R.string.catalog_title),
-                        scrollState = settingsScroll,
-                        actions = {
-                            val label = stringResource(R.string.components)
-                            IconButton(
-                                onClick = { page = Page.Components },
-                                modifier = Modifier.semantics { contentDescription = label }
+            CatalogViewport(narrow) {
+                AnimatedContent(
+                    targetState = page,
+                    transitionSpec = { fadeIn(tween(160)) togetherWith fadeOut(tween(100)) },
+                    label = "Catalog navigation"
+                ) { currentPage ->
+                    pageStates.SaveableStateProvider(currentPage.name) {
+                        when (currentPage) {
+                            Page.Settings -> SettingsScreen(
+                                title = stringResource(R.string.catalog_title),
+                                scrollState = settingsScroll,
+                                actions = {
+                                    val label = stringResource(R.string.components)
+                                    IconButton(
+                                        onClick = { page = Page.Components },
+                                        modifier = Modifier.semantics { contentDescription = label }
+                                    ) {
+                                        Text("UI", modifier = Modifier.clearAndSetSemantics {},
+                                            style = MaterialTheme.typography.labelLarge, fontFamily = FontFamily.Monospace)
+                                    }
+                                }
                             ) {
-                                Text("UI", modifier = Modifier.clearAndSetSemantics {},
-                                    style = MaterialTheme.typography.labelLarge, fontFamily = FontFamily.Monospace)
+                                Text(stringResource(R.string.catalog_intro), style = MaterialTheme.typography.bodyLarge)
+                                SettingsGroup(title = stringResource(R.string.appearance)) {
+                                    item("style") {
+                                        SettingsActionItem(
+                                            title = stringResource(R.string.design_style),
+                                            summary = styleLabel(style),
+                                            onClick = { draftStyle = style; showStylePicker = true }
+                                        )
+                                    }
+                                    item("color") {
+                                        SettingsActionItem(
+                                            title = stringResource(R.string.color_mode),
+                                            summary = colorModeLabel(colorMode),
+                                            onClick = { draftColorMode = colorMode; showColorPicker = true }
+                                        )
+                                    }
+                                    item("dynamic") {
+                                        SettingsSwitchItem(
+                                            title = stringResource(R.string.dynamic_color), checked = dynamicColor,
+                                            onCheckedChange = { dynamicColor = it },
+                                            summary = stringResource(R.string.dynamic_summary),
+                                            enabled = style != PyriteStyle.Nothing && android.os.Build.VERSION.SDK_INT >= 31
+                                        )
+                                    }
+                                    item("narrow") {
+                                        SettingsSwitchItem(
+                                            title = stringResource(R.string.narrow_preview), checked = narrow,
+                                            onCheckedChange = { narrow = it },
+                                            summary = stringResource(R.string.narrow_summary)
+                                        )
+                                    }
+                                    item("large") {
+                                        SettingsSwitchItem(
+                                            title = stringResource(R.string.large_text), checked = largeText,
+                                            onCheckedChange = { largeText = it },
+                                            summary = stringResource(R.string.large_text_summary)
+                                        )
+                                    }
+                                }
+                                SettingsGroup(title = stringResource(R.string.sample_settings)) {
+                                    item("notifications") {
+                                        SettingsSwitchItem(
+                                            title = stringResource(R.string.notifications), checked = notifications,
+                                            onCheckedChange = { notifications = it },
+                                            summary = stringResource(R.string.notifications_summary)
+                                        )
+                                    }
+                                    item("optional") {
+                                        SettingsSwitchItem(
+                                            title = stringResource(R.string.optional_row), checked = optionalRow,
+                                            onCheckedChange = { optionalRow = it }
+                                        )
+                                    }
+                                    if (optionalRow) item("counter") {
+                                        SettingsActionItem(
+                                            title = stringResource(R.string.action_counter),
+                                            summary = pluralStringResource(R.plurals.counter_value, clicks, clicks),
+                                            onClick = { clicks++ }
+                                        )
+                                    }
+                                    item("disabled") {
+                                        SettingsSwitchItem(
+                                            title = stringResource(R.string.disabled_setting), checked = true,
+                                            onCheckedChange = {}, enabled = false,
+                                            summary = stringResource(R.string.disabled_summary)
+                                        )
+                                    }
+                                }
+                                SettingsGroup(title = stringResource(R.string.explore)) {
+                                    item("about") {
+                                        SettingsActionItem(
+                                            title = stringResource(R.string.about),
+                                            summary = stringResource(R.string.about_summary),
+                                            onClick = { aboutFromComponents = false; page = Page.About }
+                                        )
+                                    }
+                                    item("components") {
+                                        SettingsActionItem(
+                                            title = stringResource(R.string.components),
+                                            summary = stringResource(R.string.components_summary),
+                                            onClick = { page = Page.Components }
+                                        )
+                                    }
+                                }
                             }
-                        }
-                    ) {
-                        Text(stringResource(R.string.catalog_intro), style = MaterialTheme.typography.bodyLarge)
-                        SettingsGroup(title = stringResource(R.string.appearance)) {
-                            item("style") {
-                                SettingsActionItem(
-                                    title = stringResource(R.string.design_style),
-                                    summary = styleLabel(style),
-                                    onClick = { draftStyle = style; showStylePicker = true }
-                                )
+                            Page.About -> AboutScreen(
+                                title = stringResource(R.string.about),
+                                info = AboutInfo(
+                                    name = "Pyrite", version = "0.1.0-SNAPSHOT",
+                                    description = stringResource(R.string.about_description),
+                                    details = listOf(
+                                        AboutDetail("m3", "Material 3", "1.5.0-beta01"),
+                                        AboutDetail("compose", "Compose", "1.12.0"),
+                                        AboutDetail("style", stringResource(R.string.design_style), styleLabel(style))
+                                    )
+                                ),
+                                icon = { PyriteMark() },
+                                navigationIcon = { BackButton(leaveAbout) },
+                                linksTitle = stringResource(R.string.resources),
+                                links = listOf(
+                                    AboutLink("material", "Material 3", "https://developer.android.com/develop/ui/compose/designsystems/material3"),
+                                    AboutLink("compose", "Jetpack Compose", "https://developer.android.com/develop/ui/compose")
+                                ),
+                                onLinkClick = { link ->
+                                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, link.url.toUri())) }
+                                        .onFailure { Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show() }
+                                }
+                            ) {
+                                SettingsGroup(title = stringResource(R.string.integration)) {
+                                    item("artifact") {
+                                        SettingsActionItem(
+                                            title = stringResource(R.string.maven_artifact),
+                                            summary = "jp.linkserver:pyrite:0.1.0-SNAPSHOT",
+                                            onClick = { Toast.makeText(context, R.string.artifact_hint, Toast.LENGTH_SHORT).show() }
+                                        )
+                                    }
+                                }
                             }
-                            item("color") {
-                                SettingsActionItem(
-                                    title = stringResource(R.string.color_mode),
-                                    summary = colorModeLabel(colorMode),
-                                    onClick = { draftColorMode = colorMode; showColorPicker = true }
-                                )
-                            }
-                            item("dynamic") {
-                                SettingsSwitchItem(
-                                    title = stringResource(R.string.dynamic_color), checked = dynamicColor,
-                                    onCheckedChange = { dynamicColor = it },
-                                    summary = stringResource(R.string.dynamic_summary),
-                                    enabled = style != PyriteStyle.Nothing && android.os.Build.VERSION.SDK_INT >= 31
-                                )
-                            }
-                            item("large") {
-                                SettingsSwitchItem(
-                                    title = stringResource(R.string.large_text), checked = largeText,
-                                    onCheckedChange = { largeText = it },
-                                    summary = stringResource(R.string.large_text_summary)
-                                )
-                            }
-                        }
-                        SettingsGroup(title = stringResource(R.string.sample_settings)) {
-                            item("notifications") {
-                                SettingsSwitchItem(
-                                    title = stringResource(R.string.notifications), checked = notifications,
-                                    onCheckedChange = { notifications = it },
-                                    summary = stringResource(R.string.notifications_summary)
-                                )
-                            }
-                            item("optional") {
-                                SettingsSwitchItem(
-                                    title = stringResource(R.string.optional_row), checked = optionalRow,
-                                    onCheckedChange = { optionalRow = it }
-                                )
-                            }
-                            if (optionalRow) item("counter") {
-                                SettingsActionItem(
-                                    title = stringResource(R.string.action_counter),
-                                    summary = pluralStringResource(R.plurals.counter_value, clicks, clicks),
-                                    onClick = { clicks++ }
-                                )
-                            }
-                            item("disabled") {
-                                SettingsSwitchItem(
-                                    title = stringResource(R.string.disabled_setting), checked = true,
-                                    onCheckedChange = {}, enabled = false,
-                                    summary = stringResource(R.string.disabled_summary)
-                                )
-                            }
-                        }
-                        SettingsGroup(title = stringResource(R.string.explore)) {
-                            item("about") {
-                                SettingsActionItem(
-                                    title = stringResource(R.string.about),
-                                    summary = stringResource(R.string.about_summary),
-                                    onClick = { page = Page.About }
-                                )
-                            }
-                            item("components") {
-                                SettingsActionItem(
-                                    title = stringResource(R.string.components),
-                                    summary = stringResource(R.string.components_summary),
-                                    onClick = { page = Page.Components }
-                                )
-                            }
-                        }
-                    }
-                    Page.About -> AboutScreen(
-                        title = stringResource(R.string.about),
-                        info = AboutInfo(
-                            name = "Pyrite", version = "0.1.0-SNAPSHOT",
-                            description = stringResource(R.string.about_description),
-                            details = listOf(
-                                AboutDetail("m3", "Material 3", "1.5.0-beta01"),
-                                AboutDetail("compose", "Compose", "1.12.0"),
-                                AboutDetail("style", stringResource(R.string.design_style), styleLabel(style))
+                            Page.Components -> ComponentsPage(
+                                style = style, onBack = { page = Page.Settings },
+                                onStyle = { draftStyle = style; showStylePicker = true },
+                                onColorMode = { draftColorMode = colorMode; showColorPicker = true },
+                                onAbout = { aboutFromComponents = true; page = Page.About }
                             )
-                        ),
-                        icon = { PyriteMark() },
-                        navigationIcon = { BackButton { page = Page.Settings } },
-                        linksTitle = stringResource(R.string.resources),
-                        links = listOf(
-                            AboutLink("material", "Material 3", "https://developer.android.com/develop/ui/compose/designsystems/material3"),
-                            AboutLink("compose", "Jetpack Compose", "https://developer.android.com/develop/ui/compose")
-                        ),
-                        onLinkClick = { link ->
-                            runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, link.url.toUri())) }
-                                .onFailure { Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show() }
-                        }
-                    ) {
-                        SettingsGroup(title = stringResource(R.string.integration)) {
-                            item("artifact") {
-                                SettingsActionItem(
-                                    title = stringResource(R.string.maven_artifact),
-                                    summary = "jp.linkserver:pyrite:0.1.0-SNAPSHOT",
-                                    onClick = { Toast.makeText(context, R.string.artifact_hint, Toast.LENGTH_SHORT).show() }
-                                )
-                            }
                         }
                     }
-                    Page.Components -> ComponentsPage(
-                        style = style, onBack = { page = Page.Settings }
-                    )
                 }
             }
             if (showStylePicker) SettingsChoiceDialog(
@@ -246,65 +269,57 @@ internal fun PyriteCatalog() {
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun ComponentsPage(style: PyriteStyle, onBack: () -> Unit) {
-    val sliderState = rememberSliderState(.5f)
-    val progress = sliderState.value
+internal fun ColumnScope.OfficialComponentsContent(style: PyriteStyle) {
+    var progress by rememberSaveable { mutableFloatStateOf(.5f) }
+    val sliderState = rememberSliderState(progress)
     var expanded by rememberSaveable { mutableStateOf(false) }
     var selected by rememberSaveable { mutableIntStateOf(0) }
     var clicks by rememberSaveable { mutableIntStateOf(0) }
     val progressLabel = stringResource(R.string.progress)
-    SettingsScreen(
-        title = stringResource(R.string.components),
-        navigationIcon = { BackButton(onBack) }
-    ) {
-        Text(stringResource(R.string.official_components), style = MaterialTheme.typography.bodyLarge)
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(stringResource(R.string.buttons), style = MaterialTheme.typography.titleMedium)
-                Button(onClick = { clicks++ }) { Text(pluralStringResource(R.plurals.counter_value, clicks, clicks)) }
-                val labels = listOf(stringResource(R.string.option_one), stringResource(R.string.option_two))
-                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                    labels.forEachIndexed { index, label ->
-                        SegmentedButton(
-                            selected = selected == index, onClick = { selected = index },
-                            shape = SegmentedButtonDefaults.itemShape(index, labels.size)
-                        ) { Text(label) }
-                    }
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(stringResource(R.string.buttons), style = MaterialTheme.typography.titleMedium)
+            Button(onClick = { clicks++ }) { Text(pluralStringResource(R.plurals.counter_value, clicks, clicks)) }
+            val labels = listOf(stringResource(R.string.option_one), stringResource(R.string.option_two))
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                labels.forEachIndexed { index, label ->
+                    SegmentedButton(
+                        selected = selected == index, onClick = { selected = index },
+                        shape = SegmentedButtonDefaults.itemShape(index, labels.size)
+                    ) { Text(label) }
                 }
             }
         }
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(stringResource(R.string.progress), style = MaterialTheme.typography.titleMedium)
-                if (style == PyriteStyle.Material3Expressive) {
-                    LoadingIndicator()
-                } else {
-                    CircularProgressIndicator()
-                }
-                Text(stringResource(R.string.progress_value, (progress * 100).toInt()))
-                Slider(state = sliderState, onValueChange = { sliderState.value = it },
-                    modifier = Modifier.semantics { contentDescription = progressLabel })
-                LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
+    }
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(stringResource(R.string.progress), style = MaterialTheme.typography.titleMedium)
+            if (style == PyriteStyle.Material3Expressive) {
+                LoadingIndicator()
+            } else {
+                CircularProgressIndicator()
             }
+            Text(stringResource(R.string.progress_value, (progress * 100).toInt()))
+            Slider(state = sliderState, onValueChange = { sliderState.value = it; progress = it },
+                modifier = Modifier.semantics { contentDescription = progressLabel })
+            LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
         }
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                TextButton(onClick = { expanded = !expanded }) {
-                    Text(stringResource(if (expanded) R.string.collapse else R.string.expand))
-                }
-                AnimatedVisibility(
-                    visible = expanded, enter = expandVertically() + fadeIn(),
-                    exit = shrinkVertically() + fadeOut()
-                ) { Text(stringResource(R.string.expansion_body)) }
+    }
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            TextButton(onClick = { expanded = !expanded }) {
+                Text(stringResource(if (expanded) R.string.collapse else R.string.expand))
             }
+            AnimatedVisibility(
+                visible = expanded, enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) { Text(stringResource(R.string.expansion_body)) }
         }
     }
 }
 
-
-
 @Composable
-private fun PyriteMark() {
+internal fun PyriteMark() {
     Surface(
         modifier = Modifier.size(72.dp), shape = RoundedCornerShape(22.dp),
         color = MaterialTheme.colorScheme.tertiaryContainer
@@ -316,7 +331,7 @@ private fun PyriteMark() {
 }
 
 @Composable
-private fun BackButton(onBack: () -> Unit) {
+internal fun BackButton(onBack: () -> Unit) {
     val label = stringResource(R.string.back)
     IconButton(onBack, modifier = Modifier.semantics { contentDescription = label }) {
         Text("‹", modifier = Modifier.clearAndSetSemantics {}, style = MaterialTheme.typography.headlineMedium)
@@ -324,7 +339,7 @@ private fun BackButton(onBack: () -> Unit) {
 }
 
 @Composable
-private fun styleLabel(style: PyriteStyle): String = when (style) {
+internal fun styleLabel(style: PyriteStyle): String = when (style) {
     PyriteStyle.Material3 -> "Material 3"
     PyriteStyle.Material3Expressive -> "Material 3 Expressive"
     PyriteStyle.Nothing -> stringResource(R.string.nothing_style)
@@ -343,3 +358,15 @@ private fun colorModeLabel(mode: ColorMode): String = stringResource(when (mode)
     ColorMode.Light -> R.string.light_mode
     ColorMode.Dark -> R.string.dark_mode
 })
+
+/** Preview width is app-only; public screen geometry remains library-owned. */
+@Composable
+private fun CatalogViewport(narrow: Boolean, content: @Composable () -> Unit) {
+    Surface(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            Box(Modifier.widthIn(max = if (narrow) 360.dp else Dp.Infinity).fillMaxSize()) {
+                content()
+            }
+        }
+    }
+}

@@ -33,6 +33,10 @@ fun PyriteTheme(
     nothingFontFamily: FontFamily = FontFamily.SansSerif,
     content: @Composable () -> Unit
 ) {
+    // The official themes occupy different composition branches. Keep caller UI identity
+    // when moving between them, including nested saveable state holders and focus state.
+    val currentContent = rememberUpdatedState(content)
+    val stableContent = remember { movableContentOf { currentContent.value() } }
     val context = LocalContext.current
     val colors = colorScheme ?: when {
         style == PyriteStyle.Nothing -> nothingColors(darkTheme)
@@ -46,7 +50,7 @@ fun PyriteTheme(
         if (style == PyriteStyle.Material3Expressive) {
             MaterialExpressiveTheme(
                 colorScheme = colors, typography = typography, shapes = shapes,
-                motionScheme = MotionScheme.expressive(), content = content
+                motionScheme = MotionScheme.expressive(), content = stableContent
             )
         } else {
             MaterialTheme(
@@ -54,7 +58,7 @@ fun PyriteTheme(
                 typography = typography ?: if (style == PyriteStyle.Nothing) Typography(fontFamily = nothingFontFamily) else Typography(),
                 shapes = shapes ?: if (style == PyriteStyle.Nothing) NothingShapes else Shapes(),
                 motionScheme = MotionScheme.standard(),
-                content = content
+                content = stableContent
             )
         }
     }

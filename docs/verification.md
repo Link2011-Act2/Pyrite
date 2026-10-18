@@ -83,3 +83,76 @@ UI検証は、3スタイルでのSwitchのrole・checked・無効化・1回のca
 API 26端末、各メーカー実機、TalkBack実機操作、定量的な性能・バッテリー測定、consumerの完全な空キャッシュでのダウンロードは未検証です。既存アプリへの依存導入・移行ビルドも未実施です。数値・時刻編集などの追加部品は今後の計画のままです。
 
 Phase 3は別途許可された調査と計画提示まで完了しており、承認待ちです。今回の予約で移行実装やPhase 4の調査へ進んでいません。追加の自動実行は設定していません。
+
+## 標準デザイン・カタログ拡充（今回）
+
+同日、UI設計方針の変更に対応しました。上記のPhase 1/2の公開SHAとは別の、現在の作業ツリーの検証記録です。既存3アプリは引き続き変更していません。
+
+### 実装とデザイン
+
+- String summary版の既存APIを維持し、Action/Switch/RadioのsupportingContent overloadを追加。
+- SettingsInfoItem / SettingsStatusItem、SettingsInfoCard / SettingsActionCard、AboutOverviewMosaicを追加。
+- M3Eは公式SegmentedListItem・segmentedShapes・LoadingIndicatorを使用。通常／無効行の背景だけを公式segmentedColorsでsurfaceContainerHighへ揃え、連結形状を見やすくしました。
+- AboutOverviewは標準の連結モザイクへ統一。狭幅・拡大文字で縦積み、広幅で補足情報を2列にします。
+- 外部に角丸・行間・文字階層等を指定する新APIは追加していません。配色・明暗・Dynamic Colorと既存テーマoverrideは維持。
+- カタログは6カテゴリ、複数グループの画面例、長文・有効／無効・読み込み・動的表示・確定／取消を操作できます。
+
+### ビルド・Maven・Lint
+
+| 確認 | 結果 |
+| --- | --- |
+| AAR assembleRelease | 成功、107,891 bytes |
+| カタログ assembleDebug / assembleDebugAndroidTest | 成功 |
+| カタログ assembleRelease | 成功、R8適用・未署名 |
+| verify-published.ps1 | 最終修正後も発行・独立consumer・Maven版カタログの全段階成功 |
+| 発行AARとローカルrelease AAR | SHA-256一致 |
+| sources JAR | 9 Kotlinファイル |
+| JVM | 既存1件成功、失敗0。設定グループ重複キーのテストを維持 |
+| ライブラリLint release | 問題なし |
+| カタログLint debug | エラー0・警告9。既存と同じ依存更新通知のみ |
+
+AAR SHA-256：`5429EED796CC6014E3910A29A3BE7DFB33594C8912D1E044B023BC8A6893EDD5`。
+
+通常のローカル座標jp.linkserver:pyrite:0.1.0-SNAPSHOTと、JitPack向けpublication・jitpack.yml・検証スクリプトは維持しています。今回の追加APIは、既存のJitPack公開確認済み4244bedには含まれません。現在の作業ツリーは未コミット・未Pushです。新しい固定SHAのリモート公開取得は未実施です。
+
+### UI検証
+
+API 35のPixel_6aを読み取り専用で起動し、720×1280 px・density 240（幅480dp）で実行しました。Gradleの終了後にAVDを起動し、ビルドと同時実行していません。接続実機は操作していません。
+
+**全13件成功、失敗0（147.113秒）**。既存7件を維持し、6件を追加しています。
+
+- 3スタイルのSwitchのrole、ON/OFF、無効化、callbackが1回だけであること。
+- 明暗・スタイル変更でホスト状態を維持すること。
+- 選択の下書き・取消・確定、安定keyでの行追加。
+- 幅280dp・文字200%のAboutを6テーマで表示。
+- 設定→About→公式コントロール、Activity再生成。
+- カタログの3スタイル×ライト／ダーク。
+- カテゴリ間・テーマ境界・再生成後の操作状態の復元。
+- 確認ダイアログの確定条件・取消、ON時だけ確認する設定例。
+- 補足slot、非クリック情報、Politeな状態行、読み込み中の操作防止を6テーマで確認。
+- Aboutのバージョンと補足情報のcallbackを独立して確認。
+- 表示切替アニメーションを途中で反転しても最終状態・操作回数が正しいこと。
+- テーマ境界を越えて局所UI状態と最新callbackが維持されること。
+
+M3Eから通常テーマの内部構造へ切り替えると、カテゴリとその局所状態を失う不具合を追加テストで発見しました。公式movableContentOf＋rememberUpdatedStateで内容のidentityを維持して修正し、切替直後とActivity再生成後の両方を確認しています。
+
+24枚のテーマ画像を回収し、各スタイルの通常／明暗、M3Eの連結背景とモザイクを確認しました。追加の手動操作では、日本語・横画面への実回転後のSwitch値、OS文字200%・幅360dpでの長い画面名・行の折返しとスクロール、読み込み中ボタンの無効化を確認しました。
+
+### 証跡と未検証
+
+- build/catalog-maven-final.txt：最終発行・独立consumer・Mavenカタログ。
+- build/catalog-release-final.txt：Release・Lint。
+- build/verification/catalog/ui-tests.txt：13件成功のログ。
+- build/verification/catalog/ui-tests-before-fix.txt：状態保持不具合の初回失敗。
+- build/verification/catalog/screenshots-final/：24画像。
+- build/verification/catalog/japanese-landscape.png、japanese-large-cards-settled.png、japanese-large-action-checked.png：手動確認。
+- pyrite/build/reports/tests/testDebugUnitTest/index.html：JVM。
+- app/build/reports/lint-results-debug.html、pyrite/build/reports/lint-results-release.html：Lint。
+
+TalkBackの実操作、API 26端末・各メーカー実機、プロセス終了からの復帰、定量的な性能測定、既存アプリ側の依存更新・移行ビルドは未実施です。semanticsテストをTalkBack実操作の代替とはしていません。UI変更に伴う公開API・使用例・手動チェックは [catalog.md](catalog.md)、ShutUpの計画は [shutup-migration-plan.md](shutup-migration-plan.md) を参照してください。
+
+予約済みJitPack自動検証の設定・時刻・promptは変更・削除していません。追加の自動実行・タグ・Release・GitHub Actionsは作成していません。
+
+
+最終Maven版APKでは、カテゴリ／テーマ／Activity再生成の状態復元、条件付き確認の確定・取消、局所UI状態と最新callbackの3件を追加実行し、すべて成功しました（61.586秒）。ログは build/verification/catalog/maven-ui-tests.txt です。全件13件の後の最終整理は、重複説明・数量文言・未使用importの整理のみで、ライブラリの振る舞いは変えていません。全件の不要な再実行は避け、最終配布形態に関係するケースを選んで確認しました。
+最終AARのclasses.jarにMIT本文とNOTICEを確認し、AAR内のフォントファイルは0件でした。今回起動した検証AVDは終了しました。

@@ -4,16 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import jp.linkserver.pyrite.settings.SettingsActionItem
 import jp.linkserver.pyrite.settings.SettingsGroup
 import jp.linkserver.pyrite.settings.SettingsScreen
-import jp.linkserver.pyrite.theme.LocalPyriteStyle
-import jp.linkserver.pyrite.theme.PyriteStyle
 
 /** Host-provided app identity; version parsing and PackageManager access stay in the host. */
 data class AboutInfo(
@@ -72,63 +66,5 @@ fun AboutOverview(
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null
 ) {
-    val nothing = LocalPyriteStyle.current == PyriteStyle.Nothing
-    val fontScale = LocalDensity.current.fontScale
-    require(info.details.map { it.key }.distinct().size == info.details.size) {
-        "About detail keys must be unique"
-    }
-    BoxWithConstraints(modifier.fillMaxWidth()) {
-        val stack = maxWidth < 480.dp || fontScale >= 1.5f
-        val identity: @Composable () -> Unit = {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    icon?.invoke()
-                    Text(
-                        info.name, style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.semantics { heading() }
-                    )
-                    Text(
-                        info.version, style = MaterialTheme.typography.titleLarge
-                    )
-                    info.description?.let {
-                        Text(it, style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-            }
-        }
-        val details: @Composable () -> Unit = {
-            Column(verticalArrangement = Arrangement.spacedBy(if (nothing) 3.dp else 8.dp)) {
-                info.details.forEach { detail ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
-                    ) {
-                        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(detail.label, style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(detail.value, style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
-                }
-            }
-        }
-        if (stack) {
-            Column(verticalArrangement = Arrangement.spacedBy(if (nothing) 3.dp else 12.dp)) {
-                identity()
-                if (info.details.isNotEmpty()) details()
-            }
-        } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(if (nothing) 3.dp else 12.dp)) {
-                Box(Modifier.weight(1.3f)) { identity() }
-                if (info.details.isNotEmpty()) Box(Modifier.weight(1f)) { details() }
-            }
-        }
-    }
+    AboutOverviewMosaic(info = info, modifier = modifier, icon = icon)
 }

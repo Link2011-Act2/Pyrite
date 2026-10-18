@@ -2,6 +2,12 @@
 
 既存のGlyph Barty・NITTC Scheduler・ShutUpは変更していません。この文書は、各アプリ側の変更許可を得た後の手順です。
 
+## 標準デザインを採用
+
+各アプリの角丸・行間・文字・Switchの意匠を完全再現する方針は採用しません。Pyriteの3スタイルの標準へ統一し、変わる見た目と維持する操作仕様を分けて確認します。既存テーマoverrideで旧デザインを恒久的に再構築しません。ShutUpの具体的な保存・確認・無効化条件は [shutup-migration-plan.md](shutup-migration-plan.md) を参照してください。カタログの確認後、ユーザーの別途指示で導入します。
+
+今回追加したAPIは既存のJitPack検証済みSHAには含まれません。導入前に必要APIを含む固定SHAの公開取得を確認します。
+
 ## ビルドの前提
 
 PyriteはMaterial 3 1.5.0-beta01 / Compose 1.12.0を使用します。依存関係にはcompileSdk 37 / AGP 9.1.0以上が必要です。利用側の最終的な依存解決結果を確認し、古いComposeやMaterial 3への強制固定を解消します。今回の独立consumer検証はAGP 9.4.1で実施します。
@@ -28,7 +34,7 @@ targetSdkの変更はこの導入計画に含めません。Kotlin/Compose Compi
 | Glyph SettingsRadioEntry | 型付き選択データとSettingsChoiceDialog、またはSettingsRadioItem |
 | Scheduler AppSettingsSwitchItem / AppSettingsNavigationItem | SettingsSwitchItem / SettingsActionItem |
 | ShutUpの繰り返されるSwitch設定行 | SettingsSwitchItem |
-| 各アプリのAboutモザイク | AboutOverview、またはAboutScreen全体の表示部分 |
+| 各アプリのAboutモザイク | AboutOverviewMosaic、またはAboutScreen全体の表示部分 |
 
 単なるButton/Card/Slider等は公式APIを維持します。遷移とSwitchが独立した複合行は初期版にないため、既存実装を残してください。画面全体を機械的にコピー・置換しないでください。
 
