@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">Pyrite カタログ</string>
+    <string name="catalog_title">Pyrite</string>
+    <string name="catalog_intro">共通の設定・About UIです。デザインや文字サイズを変更し、状態を保ったまま各スタイルを確認できます。</string>
+    <string name="components">コンポーネント</string>
+    <string name="appearance">外観</string>
+    <string name="design_style">デザインスタイル</string>
+    <string name="color_mode">カラーモード</string>
+    <string name="dynamic_color">ダイナミックカラー</string>
+    <string name="dynamic_summary">Android 12以降の壁紙色を使用します。Nothing風では固定の配色を使います。</string>
+    <string name="large_text">大きな文字のプレビュー</string>
+    <string name="large_text_summary" formatted="false">端末設定に対して文字を150%に拡大します。</string>
+    <string name="sample_settings">設定のサンプル</string>
+    <string name="notifications">通知</string>
+    <string name="notifications_summary">デモ用の状態です。行全体でスイッチを操作できます。</string>
+    <string name="optional_row">追加の項目を表示</string>
+    <string name="action_counter">操作カウンター</string>
+    <plurals name="counter_value"><item quantity="other">%1$d回操作しました</item></plurals>
+    <string name="disabled_setting">利用できない設定</string>
+    <string name="disabled_summary">行とスイッチの両方が無効になります。</string>
+    <string name="explore">表示を確認</string>
+    <string name="about">アプリについて</string>
+    <string name="about_summary">アプリ情報、バージョン、補足情報、リンクを表示します。</string>
+    <string name="components_summary">選択中のテーマで公式Materialコンポーネントを確認できます。</string>
+    <string name="about_description">Material 3・Material 3 Expressive・Nothing風の意匠に対応する、再利用可能なCompose UIです。</string>
+    <string name="resources">関連リンク</string>
+    <string name="integration">導入</string>
+    <string name="maven_artifact">Mavenアーティファクト</string>
+    <string name="artifact_hint">ローカルMavenへの発行・導入方法はREADMEをご覧ください。</string>
+    <string name="no_browser">ブラウザを開けませんでした。</string>
+    <string name="apply">適用</string>
+    <string name="cancel">キャンセル</string>
+    <string name="back">戻る</string>
+    <string name="nothing_style">Nothing風</string>
+    <string name="material_description">通常のMaterial配色、モーション、操作可能なリスト項目です。</string>
+    <string name="expressive_description">Google公式のExpressiveテーマ、連結リスト、モーションを使用します。</string>
+    <string name="nothing_description">白黒の面、赤のアクセント、連結した角丸カード。専有フォントは同梱しません。</string>
+    <string name="system_mode">システムに合わせる</string>
+    <string name="light_mode">ライト</string>
+    <string name="dark_mode">ダーク</string>
+    <string name="official_components">各コントロールはMaterial 3を直接使用します。Pyriteは設定画面の構造とAbout表示を提供します。</string>
+    <string name="buttons">ボタン・単一選択</string>
+    <string name="option_one">1つ目</string>
+    <string name="option_two">2つ目</string>
+    <string name="progress">進捗</string>
+    <string name="progress_value">%1$d%%</string>
+    <string name="expand">詳細を展開</string>
+    <string name="collapse">詳細を折りたたむ</string>
+    <string name="expansion_body">公式のAnimatedVisibilityによる展開です。設定の状態はサンプルが管理し、画面遷移やテーマ変更でも維持します。</string>
+</resources>

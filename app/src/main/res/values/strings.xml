@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">Pyrite Catalog</string>
+    <string name="catalog_title">Pyrite</string>
+    <string name="catalog_intro">Shared settings and About UI. Change the design and text size to explore the same state across styles.</string>
+    <string name="components">Components</string>
+    <string name="appearance">Appearance</string>
+    <string name="design_style">Design style</string>
+    <string name="color_mode">Color mode</string>
+    <string name="dynamic_color">Dynamic color</string>
+    <string name="dynamic_summary">Wallpaper colors on Android 12+. Nothing uses its own fixed palette.</string>
+    <string name="large_text">Large text preview</string>
+    <string name="large_text_summary" formatted="false">Scale text to 150% of the device setting.</string>
+    <string name="sample_settings">Sample settings</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_summary">Demo state only. The entire row toggles this switch.</string>
+    <string name="optional_row">Show optional row</string>
+    <string name="action_counter">Action counter</string>
+    <plurals name="counter_value"><item quantity="one">Activated %1$d time</item><item quantity="other">Activated %1$d times</item></plurals>
+    <string name="disabled_setting">Unavailable setting</string>
+    <string name="disabled_summary">Disabled state applies to both the row and switch.</string>
+    <string name="explore">Explore</string>
+    <string name="about">About</string>
+    <string name="about_summary">Identity cards, version, metadata and links.</string>
+    <string name="components_summary">Official Material components with the selected theme.</string>
+    <string name="about_description">Reusable Compose UI with Material 3, Material 3 Expressive and a Nothing-inspired visual family.</string>
+    <string name="resources">Resources</string>
+    <string name="integration">Integration</string>
+    <string name="maven_artifact">Maven artifact</string>
+    <string name="artifact_hint">See the project README for local Maven publishing and usage.</string>
+    <string name="no_browser">No browser is available.</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
+    <string name="nothing_style">Nothing-inspired</string>
+    <string name="material_description">Standard Material colors, motion and interactive list items.</string>
+    <string name="expressive_description">Google Expressive theme, segmented lists and expressive motion.</string>
+    <string name="nothing_description">Monochrome surfaces, red accent and connected rounded cards. No proprietary fonts bundled.</string>
+    <string name="system_mode">Follow system</string>
+    <string name="light_mode">Light</string>
+    <string name="dark_mode">Dark</string>
+    <string name="official_components">These controls use Material 3 directly. Pyrite adds settings structure and About composition.</string>
+    <string name="buttons">Buttons and single selection</string>
+    <string name="option_one">First</string>
+    <string name="option_two">Second</string>
+    <string name="progress">Progress</string>
+    <string name="progress_value">%1$d%%</string>
+    <string name="expand">Expand details</string>
+    <string name="collapse">Collapse details</string>
+    <string name="expansion_body">This is the official AnimatedVisibility transition. Settings state remains owned by the sample, across navigation and theme changes.</string>
+</resources>
