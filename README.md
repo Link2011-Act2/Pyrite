@@ -1,5 +1,4 @@
-# Project Pyrite
-
+# Project Pyrite - Fool's Material 3
 複数のAndroidアプリで共通利用する、Jetpack Composeの設定画面・About画面ライブラリです。
 
 - Android Library `:pyrite`：状態を外部から渡す設定UIとAbout表示。
