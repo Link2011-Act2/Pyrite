@@ -61,7 +61,7 @@ Android UIテストの範囲：
 ## 残された範囲
 
 - API 26端末、各メーカーの実機、TalkBack実機操作、性能・バッテリーの定量測定は未検証。
-- リモートMavenレジストリへの公開、署名、認証情報は未設定。
+- JitPack用設定は追加済み。リモートからの取得・Linuxビルダーでの実ビルドは未検証。詳細はdocs/distribution.mdを参照。
 - 数値・時刻編集、独立した遷移＋Switch、OSS一覧、状態モーフなどはREADMEの段階追加計画に残しています。
 - 既存3アプリへの依存導入・移行ビルドは未実施です。
 
@@ -76,3 +76,23 @@ NITTC Scheduler：HEAD 26913ba。調査開始時から存在する以下の3変�
 - ui/components/AppSettingsComponents.kt
 
 Pyriteの既存未追跡`.idea/.name`も保持しました。
+
+## 開発再開時の最終確認
+
+Maven発行版のカタログで追加のAndroid UIテスト2件が成功しました（78.667秒、失敗0）。3スタイル×ライト／ダークのテーマ操作・状態保持、幅280dp・文字サイズ200%のAboutを確認しています。ログはbuild/verification/maven-ui-tests.txt、18枚の画像はbuild/verification/maven-screenshotsに保存しました。画像をMediaStoreへ保存し、テスト後にも回収できることを確認しています。テスト用エミュレーターは終了しました。
+
+## JitPack対応のローカル検証
+
+- `jitpack.yml`、SDK準備スクリプト、JitPack環境変数による公開座標の切り替えを追加。
+- `scripts/verify-jitpack.ps1`のローカルモード：成功（consumerはclean後に38タスク、2分）。
+- `com.github.Link2011-Act2:Pyrite:0.1.0-localcheck`を専用mavenLocalへ発行し、POMのみで独立consumerのAPKをビルド。
+- Pyriteのソースを含まないコピー先で、UI / Foundation / Animation 1.12.0、Material 3 1.5.0-beta01が推移依存から解決されることを確認。
+- AAR、sources JAR、POM、Gradle Module Metadataを確認。発行AARのSHA-256は通常のrelease AARと一致：`D7D6395E59CB7312FB260F9338E3C6137CB3C98A522C10C73F9D6C693B44370D`。
+- シェル構文チェック成功、Gradle wrapperはindex・作業ファイルともLF。実行権限に依存せず`sh gradlew`で呼び出す設定。
+- 切り替え後も通常の`scripts/verify-published.ps1`が全段階成功。通常座標`jp.linkserver:pyrite:0.1.0-SNAPSHOT`を維持。
+
+JitPack実サーバーでのビルドとリモート取得は未検証です。GitHubの既定ブランチはb11a607で、今回の設定はまだ作業ツリーにあります。認証なしGitHub APIへの問い合わせは404でした。公開範囲・JitPackアクセスの確認と設定commitの反映後、固定commit SHAでリモートモードを実行する必要があります。タグ・GitHub Releaseは作成していません。
+
+既存の成功済みJVM・UI全件テストは再実行していません。今回は配布設定と検証手順のみを変更し、製品のCompose実装・公開API・依存バージョンは変更していません。Phase 3・4の新たな調査には未着手です。
+
+配布方針はユーザー確認により「ソースとAARを公開する」に確定しました。GitHubの公開設定は未変更です。既存3アプリのGit状態も調査開始時と一致していることを再確認しました。

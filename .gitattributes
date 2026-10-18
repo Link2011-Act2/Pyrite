@@ -1,0 +1,4 @@
+# These scripts must run on JitPack's Linux builder even when edited on Windows.
+gradlew text eol=lf
+*.sh text eol=lf
+jitpack.yml text eol=lf

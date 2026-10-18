@@ -1,0 +1,6 @@
+jdk:
+  - openjdk21
+before_install:
+  - sh scripts/jitpack-prepare.sh
+install:
+  - sh gradlew :pyrite:publishReleasePublicationToMavenLocal --no-daemon --console=plain

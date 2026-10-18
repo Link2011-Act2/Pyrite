@@ -82,7 +82,22 @@ AARファイルだけをコピーする方法では推移依存情報が失わ�
 .\scripts/verify-published.ps1
 ```
 
-標準の`:pyrite:publishToMavenLocal`も利用できます。上記の検証はユーザー共通の`~/.m2`を変更せず、プロジェクト内のMavenリポジトリを使います。リモートレジストリの接続・認証・公開は未設定です。
+標準の`:pyrite:publishToMavenLocal`も利用できます。上記の検証はユーザー共通の`~/.m2`を変更せず、プロジェクト内のMavenリポジトリを使います。JitPack向けの配布設定は下記を参照してください。
+
+## JitPackによる利用（配布準備）
+
+`jitpack.yml`でJDK 21・SDK 37と既存のMaven Publishを使用する構成を用意しています。想定座標は`com.github.Link2011-Act2:Pyrite:<revision>`です。公開対象はライブラリAAR一つです。
+
+**JitPack実サーバーからの取得は未検証です。** 設定を含むcommitのGitHub反映と、JitPackからのソースへのアクセスが必要です。タグ・GitHub Release・公開範囲の変更は行っていません。
+
+```powershell
+# 専用ローカルMavenでJitPack座標とPOMの推移依存を検証
+.\scripts/verify-jitpack.ps1
+# 公開反映後、固定commit SHAまたは承認済み0.x.xタグで取得・ビルド
+.\scripts/verify-jitpack.ps1 -Revision '<公開済みrevision>'
+```
+
+利用側のリポジトリ設定、公開前の条件、クリーンビルドの手順は[配布ドキュメント](docs/distribution.md)を参照してください。[検証結果](docs/verification.md)に実施済み・未検証の範囲を記載しています。
 
 ## 設定画面
 

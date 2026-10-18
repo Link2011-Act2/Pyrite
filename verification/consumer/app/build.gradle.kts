@@ -20,6 +20,7 @@ android {
 }
 dependencies {
     // This is intentionally a Maven coordinate, never a project dependency or included build.
-    implementation("jp.linkserver:pyrite:0.1.0-SNAPSHOT")
+    implementation(providers.gradleProperty("pyrite.coordinate")
+        .getOrElse("jp.linkserver:pyrite:0.1.0-SNAPSHOT"))
     implementation("androidx.activity:activity-compose:1.13.0")
 }

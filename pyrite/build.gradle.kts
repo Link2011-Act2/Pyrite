@@ -4,8 +4,14 @@ plugins {
     `maven-publish`
 }
 
-group = "jp.linkserver"
-version = "0.1.0-SNAPSHOT"
+// JitPack supplies these coordinates. Local development keeps its existing namespace.
+val isJitPack = providers.environmentVariable("JITPACK").orNull == "true"
+fun jitPackCoordinate(name: String): String = providers.environmentVariable(name).orNull
+    ?.takeIf { it.isNotBlank() }
+    ?: throw GradleException("JitPack must supply $name")
+group = if (isJitPack) jitPackCoordinate("GROUP") else "jp.linkserver"
+version = if (isJitPack) jitPackCoordinate("VERSION") else "0.1.0-SNAPSHOT"
+val publishedArtifactId = if (isJitPack) jitPackCoordinate("ARTIFACT") else "pyrite"
 
 android {
     namespace = "jp.linkserver.pyrite"
@@ -41,11 +47,16 @@ publishing {
     }
     publications {
         register<MavenPublication>("release") {
-            artifactId = "pyrite"
+            artifactId = publishedArtifactId
             afterEvaluate { from(components["release"]) }
             pom {
                 name = "Pyrite"
                 description = "State-hoisted Compose settings and About UI with Material and Nothing-inspired styles."
+                url = "https://github.com/Link2011-Act2/Pyrite"
+                scm {
+                    url = "https://github.com/Link2011-Act2/Pyrite"
+                    connection = "scm:git:https://github.com/Link2011-Act2/Pyrite.git"
+                }
                 licenses {
                     license {
                         name = "MIT License"
