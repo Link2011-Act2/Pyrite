@@ -4,7 +4,7 @@
 
 ## 標準デザインを採用
 
-各アプリの角丸・行間・文字・Switchの意匠を完全再現する方針は採用しません。Pyriteの3スタイルの標準へ統一し、変わる見た目と維持する操作仕様を分けて確認します。既存テーマoverrideで旧デザインを恒久的に再構築しません。ShutUpの具体的な保存・確認・無効化条件は [shutup-migration-plan.md](shutup-migration-plan.md) を参照してください。カタログの確認後、ユーザーの別途指示で導入します。
+既存のScheduler M3E・Glyph Nothingを忠実に共通化します。ShutUpのAbout帰属・更新カードも移植します。外観の自由指定APIは追加せず、状態と操作callbackをホストに残します。詳細は[source-port.md](source-port.md)と[shutup-migration-plan.md](shutup-migration-plan.md)を参照してください。導入はカタログ確認後の別途指示を待ちます。
 
 今回追加したAPIは既存のJitPack検証済みSHAには含まれません。導入前に必要APIを含む固定SHAの公開取得を確認します。
 
@@ -31,18 +31,18 @@ targetSdkの変更はこの導入計画に含めません。Kotlin/Compose Compi
 | 元の実装 | Pyriteの候補 |
 | --- | --- |
 | Glyph SettingsEntry / SettingsToggleEntry | SettingsActionItem / SettingsSwitchItem |
-| Glyph SettingsRadioEntry | 型付き選択データとSettingsChoiceDialog、またはSettingsRadioItem |
+| Glyph SettingsRadioEntry | SettingsRadioGroupItem。ダイアログが必要な場合のみSettingsChoiceDialog |
 | Scheduler AppSettingsSwitchItem / AppSettingsNavigationItem | SettingsSwitchItem / SettingsActionItem |
 | ShutUpの繰り返されるSwitch設定行 | SettingsSwitchItem |
 | 各アプリのAboutモザイク | AboutOverviewMosaic、またはAboutScreen全体の表示部分 |
 
-単なるButton/Card/Slider等は公式APIを維持します。遷移とSwitchが独立した複合行は初期版にないため、既存実装を残してください。画面全体を機械的にコピー・置換しないでください。
+単なるButton/Card/Slider等は公式APIを維持します。遷移とSwitchが独立した複合行はSettingsSplitSwitchItem、詳細のマスターはSettingsMasterSwitchを使えます。下位のenabledはホストが渡します。画面全体を機械的にコピー・置換しないでください。
 
 ## beta01固有の注意
 
 公式配布ソースで必要なAPIを照合しています。beta01はalpha25のソース互換性を一律に保証するものではありません。
 
-- Pyriteはbeta01のSegmentedListItem / segmentedShapes / MotionSchemeを使用。
+- Pyriteはbeta01のMaterialExpressiveTheme / MotionScheme / Switchを使用。元のSurface/Rowを維持するためSegmentedListItemへ置換しません。
 - Sliderのサンプルは、旧value引数版を避け、SliderStateとonValueChangeを使う公開APIへ更新。
 - Typographyのフォント指定はfontFamily引数。
 - beta01ソースには公開SplitButtonLayoutがあります。SchedulerのSplitButton呼び出しは、アプリ導入時に採用版のAPIへ合わせて照合・調整が必要です。

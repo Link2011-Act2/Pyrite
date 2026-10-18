@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import jp.linkserver.pyrite.theme.LocalPyriteStyle
 import jp.linkserver.pyrite.theme.PyriteStyle
 
@@ -40,11 +41,11 @@ fun SettingsGroup(
     Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (title != null) Text(
             title, modifier = Modifier.semantics { heading() },
-            style = MaterialTheme.typography.titleSmall,
+            style = if (expressive) MaterialTheme.typography.titleSmall.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif, fontSize = 15.sp, lineHeight = 20.sp, letterSpacing = .1.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) else MaterialTheme.typography.titleSmall.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
             color = MaterialTheme.colorScheme.primary
         )
         Column(verticalArrangement = Arrangement.spacedBy(
-            if (expressive) ListItemDefaults.SegmentedGap else 2.dp
+            2.dp
         )) {
             entries.forEachIndexed { index, entry ->
                 key(entry.first) {

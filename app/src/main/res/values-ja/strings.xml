@@ -22,18 +22,16 @@
     <string name="about">アプリについて</string>
     <string name="about_summary">アプリ情報、バージョン、補足情報、リンクを表示します。</string>
     <string name="components_summary">選択中のテーマで公式Materialコンポーネントを確認できます。</string>
-    <string name="about_description">Material 3・Material 3 Expressive・Nothing風の意匠に対応する、再利用可能なCompose UIです。</string>
+    <string name="about_description">Material 3 Expressive・Nothing風の意匠に対応する、再利用可能なCompose UIです。</string>
     <string name="resources">関連リンク</string>
     <string name="integration">導入</string>
     <string name="maven_artifact">Mavenアーティファクト</string>
-    <string name="artifact_hint">ローカルMavenへの発行・導入方法はREADMEをご覧ください。</string>
     <string name="no_browser">ブラウザを開けませんでした。</string>
     <string name="apply">適用</string>
     <string name="cancel">キャンセル</string>
     <string name="back">戻る</string>
     <string name="nothing_style">Nothing風</string>
-    <string name="material_description">通常のMaterial配色、モーション、操作可能なリスト項目です。</string>
-    <string name="expressive_description">Google公式のExpressiveテーマ、連結リスト、モーションを使用します。</string>
+    <string name="expressive_description">Schedulerの設定行とGoogle公式Expressiveテーマ・モーション。</string>
     <string name="nothing_description">白黒の面、赤のアクセント、連結した角丸カード。専有フォントは同梱しません。</string>
     <string name="system_mode">システムに合わせる</string>
     <string name="light_mode">ライト</string>
@@ -99,7 +97,6 @@
     <string name="acknowledged">説明を確認しました</string>
     <string name="confirm">確定</string>
     <string name="interactive_metadata">補足情報を操作可能にする</string>
-    <string name="release_channel">配布チャネル</string>
     <string name="build_info">ビルド情報</string>
     <string name="close">閉じる</string>
     <string name="screen_preview_title">設定画面の構成例</string>
@@ -112,4 +109,19 @@
     <string name="guarded_summary">ONにするときは確認が必要です。OFFは即座に反映します。</string>
     <plurals name="confirmation_count"><item quantity="other">%1$d回確定しました</item></plurals>
     <string name="catalog_index_intro">Pyrite標準UIを種類別に確認できます。右上からデザインと明暗を切り替えられます。</string>
+    <string name="show_attribution">Forked fromを表示</string>
+    <string name="show_metadata">Channel / Build / Versionを表示</string>
+    <string name="source_settings">元アプリの設定部品</string>
+    <string name="split_navigation">遷移とスイッチ</string>
+    <string name="catalog_hierarchy">階層型設定</string>
+    <string name="hierarchy_description">一覧と詳細の状態共有、マスターSwitch、下位設定の無効化を確認します。</string>
+    <string name="hierarchy_features">機能</string>
+    <string name="autocorrection">自動修正</string>
+    <string name="hierarchy_summary">詳細を開く／直接ON・OFFする</string>
+    <string name="hierarchy_events">Switch操作: %1$d回 · 遷移操作: %2$d回</string>
+    <string name="use_autocorrection">自動修正を使用する</string>
+    <string name="undo_section">元に戻す</string>
+    <string name="undo_correction">Backspaceで自動修正を元に戻す</string>
+    <string name="navigation_details_intro">Aboutから進む詳細画面です。戻る／再表示／Activity再生成後も、スクロール位置と補足情報の表示状態を保持します。</string>
+    <string name="navigation_details_extra">補足ビルド情報を表示</string>
 </resources>

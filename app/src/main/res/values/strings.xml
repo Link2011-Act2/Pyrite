@@ -22,18 +22,16 @@
     <string name="about">About</string>
     <string name="about_summary">Identity cards, version, metadata and links.</string>
     <string name="components_summary">Official Material components with the selected theme.</string>
-    <string name="about_description">Reusable Compose UI with Material 3, Material 3 Expressive and a Nothing-inspired visual family.</string>
+    <string name="about_description">Reusable Compose UI with Material 3 Expressive and a Nothing-inspired visual family.</string>
     <string name="resources">Resources</string>
     <string name="integration">Integration</string>
     <string name="maven_artifact">Maven artifact</string>
-    <string name="artifact_hint">See the project README for local Maven publishing and usage.</string>
     <string name="no_browser">No browser is available.</string>
     <string name="apply">Apply</string>
     <string name="cancel">Cancel</string>
     <string name="back">Back</string>
     <string name="nothing_style">Nothing-inspired</string>
-    <string name="material_description">Standard Material colors, motion and interactive list items.</string>
-    <string name="expressive_description">Google Expressive theme, segmented lists and expressive motion.</string>
+    <string name="expressive_description">Scheduler settings geometry, Google Expressive theme and expressive motion.</string>
     <string name="nothing_description">Monochrome surfaces, red accent and connected rounded cards. No proprietary fonts bundled.</string>
     <string name="system_mode">Follow system</string>
     <string name="light_mode">Light</string>
@@ -99,7 +97,6 @@
     <string name="acknowledged">I have read the explanation</string>
     <string name="confirm">Confirm</string>
     <string name="interactive_metadata">Interactive metadata</string>
-    <string name="release_channel">Release channel</string>
     <string name="build_info">Build information</string>
     <string name="close">Close</string>
     <string name="screen_preview_title">Settings screen composition</string>
@@ -112,4 +109,19 @@
     <string name="guarded_summary">Turning on requires confirmation. Turning off applies immediately.</string>
     <plurals name="confirmation_count"><item quantity="one">Confirmed %1$d time</item><item quantity="other">Confirmed %1$d times</item></plurals>
     <string name="catalog_index_intro">Explore Pyrite standard UI by category. Use the toolbar to change design and color.</string>
+    <string name="show_attribution">Show Forked from</string>
+    <string name="show_metadata">Show Channel / Build / Version</string>
+    <string name="source_settings">Source app settings</string>
+    <string name="split_navigation">Navigation and switch</string>
+    <string name="catalog_hierarchy">Hierarchical settings</string>
+    <string name="hierarchy_description">Shared list/detail state, master control and disabled dependent settings.</string>
+    <string name="hierarchy_features">Features</string>
+    <string name="autocorrection">Auto-correction</string>
+    <string name="hierarchy_summary">Open details or toggle directly</string>
+    <string name="hierarchy_events">Switch callbacks: %1$d · Navigation callbacks: %2$d</string>
+    <string name="use_autocorrection">Use auto-correction</string>
+    <string name="undo_section">Undo</string>
+    <string name="undo_correction">Undo auto-correction with Backspace</string>
+    <string name="navigation_details_intro">A detail screen opened from About. Scroll position and additional information survive back navigation and Activity recreation.</string>
+    <string name="navigation_details_extra">Show additional build information</string>
 </resources>

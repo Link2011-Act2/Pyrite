@@ -28,8 +28,10 @@ JDK 21とSDKを設定したWindows開発環境で：
 .\scripts/verify-jitpack.ps1
 
 # 公開・反映済みのcommit SHA、または承認済み0.x.xタグを使った実際の取得
-.\scripts/verify-jitpack.ps1 -Revision '4244bed7b36aa084c89d14338f176dbf87c0f263'
+.\scripts/verify-jitpack.ps1 -Revision '<current-api-commit-sha>'
 ```
+
+consumerは現行APIを使用します。下記の公開確認済み4244bedは旧API時点の証跡です。現在のconsumerでは、今回のAPI整理を含むcommitをPush後にそのSHAを指定してください。旧版を利用する互換consumerは維持しません。
 
 省略時は`build/verification/jitpack-m2`を隔離したmavenLocalとして使用します。ユーザー共通の`~/.m2`には発行しません。`0.1.0-localcheck`はローカル検証専用で、JitPack上の公開版ではありません。
 
@@ -59,8 +61,8 @@ dependencyResolutionManagement {
 `app/build.gradle.kts`：
 
 ```kotlin
-// 2026-10-18に実取得・consumerビルドを確認した固定commit。
-implementation("com.github.Link2011-Act2:Pyrite:4244bed7b36aa084c89d14338f176dbf87c0f263")
+// 現行APIを含むcommitを公開後、その固定SHAへ置換してください。
+implementation("com.github.Link2011-Act2:Pyrite:<current-api-commit-sha>")
 ```
 
 Composeの有効化、対応するCompose Compiler plugin、SDK要件はREADMEを参照してください。UI / Foundation / Material 3 / AnimationはPOMで配布します。利用側でPyriteのソースをCloneする必要はありません。可変の`master-SNAPSHOT`は再現性を求める利用には推奨しません。

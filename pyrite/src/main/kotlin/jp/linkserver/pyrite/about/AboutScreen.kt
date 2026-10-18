@@ -1,70 +1,49 @@
 package jp.linkserver.pyrite.about
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import jp.linkserver.pyrite.settings.SettingsActionItem
-import jp.linkserver.pyrite.settings.SettingsGroup
-import jp.linkserver.pyrite.settings.SettingsScreen
+import androidx.compose.ui.unit.dp
+import jp.linkserver.pyrite.theme.*
+import jp.linkserver.pyrite.screen.PyriteScreenScaffold
 
-/** Host-provided app identity; version parsing and PackageManager access stay in the host. */
-data class AboutInfo(
-    val name: String,
-    val version: String,
-    val description: String? = null,
-    val details: List<AboutDetail> = emptyList()
-)
+/** Host-formatted identity. [version] is the hero's release text, distinct from mosaic metadata. */
+data class AboutInfo(val name: String, val version: String, val description: String? = null)
 
-/** Localized label and preformatted value, e.g. build number or release channel. */
-data class AboutDetail(val key: String, val label: String, val value: String)
+/** Localized metadata label and value; its position is named in [AboutOverviewContent]. */
+data class AboutDetail(val label: String, val value: String)
 
-/** A displayable link. Pyrite delegates opening and error handling to [AboutScreen]'s host. */
+/** URL-specific resource. Navigation is performed only by the host's onLinkClick callback. */
 data class AboutLink(val key: String, val label: String, val url: String, val summary: String? = null)
 
-/**
- * About page with adaptive identity cards, external links and an application-owned content slot.
- * No network, intents, BuildConfig, persistence or application logo is embedded in this UI.
- */
+/** Dedicated About scaffold, original identity mosaic and connected action cards. */
 @Composable
-fun AboutScreen(
-    info: AboutInfo,
-    links: List<AboutLink>,
-    onLinkClick: (AboutLink) -> Unit,
-    modifier: Modifier = Modifier,
-    title: String = info.name,
-    linksTitle: String? = null,
-    navigationIcon: @Composable () -> Unit = {},
-    icon: @Composable (() -> Unit)? = null,
+fun AboutScreen(info: AboutInfo, overview: AboutOverviewContent,
+    links: List<AboutLink>, onLinkClick: (AboutLink) -> Unit,
+    modifier: Modifier = Modifier, title: String = info.name, linksTitle: String? = null,
+    navigationIcon: @Composable () -> Unit = {}, icon: @Composable (() -> Unit)? = null,
+    onVersionClick: (() -> Unit)? = null, onChannelClick: (() -> Unit)? = null,
+    onAttributionClick: ((AboutAttribution) -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit = {}
 ) {
-    SettingsScreen(title, modifier, navigationIcon) {
-        AboutOverview(info = info, icon = icon)
-        content()
-        SettingsGroup(title = linksTitle) {
-            links.forEach { link ->
-                item(link.key) {
-                    SettingsActionItem(
-                        title = link.label, summary = link.summary,
-                        onClick = { onLinkClick(link) },
-                        trailingContent = { Text("↗", Modifier.clearAndSetSemantics {}) }
-                    )
-                }
+    val nothing = LocalPyriteStyle.current == PyriteStyle.Nothing
+    PyriteScreenScaffold(title, modifier, navigationIcon) { padding ->
+        Box(Modifier.fillMaxSize().padding(padding)
+            .background(if (nothing) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background), contentAlignment = Alignment.TopCenter) {
+            Column(Modifier.widthIn(max = if (nothing) androidx.compose.ui.unit.Dp.Infinity else 840.dp).fillMaxWidth().verticalScroll(rememberScrollState())
+                .padding(horizontal = if (nothing) 20.dp else 16.dp, vertical = if (nothing) 18.dp else 16.dp),
+                verticalArrangement = Arrangement.spacedBy(if (nothing) 28.dp else 24.dp)) {
+                AboutOverviewMosaic(info, overview, Modifier.align(Alignment.CenterHorizontally), icon,
+                    onVersionClick, onChannelClick, onAttributionClick)
+                content()
+                AboutActionGroup(links.map { AboutAction(it.key, it.label, it.summary.orEmpty(), it.label) },
+                    onAction = { action -> onLinkClick(links.first { it.key == action.key }) }, title = linksTitle)
             }
         }
     }
-}
-
-/**
- * Connected identity mosaic, stacking on narrow screens or with enlarged text.
- * All cards size to their contents; arbitrary app names and versions are allowed.
- */
-@Composable
-fun AboutOverview(
-    info: AboutInfo,
-    modifier: Modifier = Modifier,
-    icon: @Composable (() -> Unit)? = null
-) {
-    AboutOverviewMosaic(info = info, modifier = modifier, icon = icon)
 }

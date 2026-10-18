@@ -26,8 +26,8 @@ import org.junit.runner.RunWith
 class PyriteExtendedComponentsTest {
     @get:Rule val compose = createComposeRule()
 
-    @Test fun richRowsStatusAndBusyActionsRespectSemanticsInSixThemes() {
-        var style by mutableStateOf(PyriteStyle.Material3)
+    @Test fun richRowsStatusAndBusyActionsRespectSemanticsInFourThemes() {
+        var style by mutableStateOf(PyriteStyle.Material3Expressive)
         var dark by mutableStateOf(false)
         var checked by mutableStateOf(false)
         var loading by mutableStateOf(false)
@@ -80,11 +80,9 @@ class PyriteExtendedComponentsTest {
             PyriteTheme {
                 SettingsScreen("About") {
                     AboutOverviewMosaic(
-                        AboutInfo("Application", "Version 1",
-                            details = listOf(AboutDetail("channel", "Channel", "Preview"))),
-                        onVersionClick = { versionEvents++ }, onDetailClick = {
-                            assertEquals("channel", it.key); detailEvents++
-                        })
+                        AboutInfo("Application", "Version 1"),
+                        AboutOverviewContent(channel = AboutDetail("Channel", "Preview")),
+                        onVersionClick = { versionEvents++ }, onChannelClick = { detailEvents++ })
                 }
             }
         }
@@ -140,7 +138,7 @@ class PyriteExtendedComponentsTest {
             compose.onNodeWithText("Local count ${index + 1}").performClick()
             compose.runOnIdle { assertEquals(index + 1, observedVersion) }
         }
-        compose.onNodeWithText("Local count 4").assertExists()
+        compose.onNodeWithText("Local count 3").assertExists()
     }
 
     private fun capture(name: String) = saveScreenshot(

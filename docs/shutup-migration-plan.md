@@ -1,10 +1,10 @@
-# ShutUp移行計画 — Pyrite標準デザインへ統一
+# ShutUp移行計画 — 既存UIを忠実に共通化
 
 更新日：2026-10-18。調査対象：ShutUp 34241e9。**ShutUpのソース・依存・保存データは変更していません。** 導入はユーザーがカタログを確認し、別途許可した後です。
 
 ## 方針の変更
 
-従来案の「ShutUpの22/6dp・2dp間隔・見出し・Switchの意匠を個別指定する互換Surface API」は採用しません。Pyriteの標準M3Eへ合わせます。画素単位の一致を受入条件にせず、デザイン変更と振る舞いの変更を分けて評価します。
+最新方針ではScheduler M3E・Glyph Nothingの元コードを基準に、ShutUpのAboutブリッジ・帰属・更新カードもライブラリ化します。アプリ別の自由な形状指定APIは追加しません。詳細は[source-port.md](source-port.md)を参照してください。
 
 既存のNavigation、ViewModel、設定保存、端末判定、確認・復元のガードはアプリに残します。Pyriteは文言・状態・callbackを受け取る表示だけを担当します。新しいテーマ選択設定をShutUpへ追加する計画ではありません。
 
@@ -16,13 +16,13 @@
 | --- | --- |
 | ui/ShutterApp.kt SettingsScreen / ScreenScaffold | SettingsScreenとSettingsGroup。Navigation・BackHandler・表示条件はホストのまま。Scaffoldを二重にしない |
 | ui/SettingsComponents.kt SettingsEntry | SettingsActionItem。言語設定・Aboutへのcallbackを維持 |
-| 同 SettingsSwitch | SettingsSwitchItem。Check/Close付き独自SwitchからPyrite標準へ。ON/OFFと無効化・1回のcallbackは維持 |
+| 同 SettingsSwitch | SettingsSwitchItem。公式SwitchのCheck/Close表示を維持。ON/OFFと無効化・1回のcallbackは維持 |
 | ui/AutoMaintainSettingsSection.kt | supportingContent付きSwitchまたはSettingsStatusItem。enabledとarmedを混同しない |
 | ui/GalaxyControlSettingsSection.kt | Switch・説明／アクションカード。ON時の確認・復元処理はホストで継続 |
 | ui/DeveloperUpdateSettingsSection.kt | SettingsGroupとSwitch。IntDev限定・各行の無効化条件はそのまま |
-| ui/AboutScreen.kt | AboutScreenの構造、SettingsActionCard、SettingsStatusItem。更新処理・結果・遷移はホスト |
-| ui/AboutOverview.kt AboutOverviewMosaic | AboutOverviewMosaic。VersionとChannel等の補足操作をcallbackへ。上流リンク・帰属はAboutのcontentに保持 |
-| 同 AboutSettingsActionCardContent | SettingsActionCard。サポート・更新・OSSの内容とcallbackを渡す |
+| ui/AboutScreen.kt | AboutScreen、AboutActionGroup、AboutUpdateCard。更新処理・結果・遷移はホスト |
+| ui/AboutOverview.kt AboutOverviewMosaic | AboutOverviewMosaic。VersionとChannel等の補足操作をcallbackへ。上流リンク・帰属はAboutAttributionへ |
+| 同 AboutSettingsActionCardContent | AboutActionGroup。サポート・更新・OSSの内容とcallbackを渡す |
 | ui/AboutScreen.kt TextDialog | 公式AlertDialog＋SelectionContainer＋スクロールを維持 |
 | ui/OssLicensesScreen.kt | 既存画面を維持しPyriteのMIT表示・本文を追加 |
 | ui/Theme.kt / Type.kt | M3E画面をPyriteTheme標準へ。OSの明暗・動的色の選択はホストから渡す |
@@ -33,10 +33,10 @@
 
 | 現在のShutUp | 移行後 |
 | --- | --- |
-| 独自Surfaceによる22/6dpの連結行 | Google公式SegmentedListItemとPyriteの標準グループ |
+| 独自Surfaceによる22/6dpの連結行 | 元コード由来の22/6dp Surfaceと2dp間隔 |
 | 太字・余白・見出しの独自指定 | Pyriteの標準文字階層と余白 |
-| Check/Close付きSwitch | Pyriteの公式Switchによる標準表示 |
-| 固有48dpブリッジ・カード寸法のAbout | 標準の連結モザイク。狭幅／拡大文字では縦積み、広幅では補足情報2列 |
+| Check/Close付きSwitch | 公式SwitchのCheck/Close表示を維持 |
+| 固有48dpブリッジ・カード寸法のAbout | 元の92dpアイコン・20dp角丸・48dpブリッジ。狭幅はScheduler由来の可変高・縦ヘッダー |
 | 独自Typographyと色の細部 | Pyrite標準M3E。ライト／ダーク／Dynamic Color自体は維持 |
 
 上流リンク・ロゴ・Version/Channelの情報と操作は失わないように配置します。操作箇所の配置変更はレビュー画像に示します。固定高さで説明を切ったり、既存の確認操作を省いたりしません。

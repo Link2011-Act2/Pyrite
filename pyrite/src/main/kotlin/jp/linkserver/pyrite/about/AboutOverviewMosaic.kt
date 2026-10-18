@@ -1,71 +1,161 @@
+// Ported from Scheduler AboutOverviewMosaic and Glyph/ShutUp AboutOverview.
+// Copyright (c) 2026 Azul1nk. MIT; see NOTICE.md.
 package jp.linkserver.pyrite.about
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.*
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import jp.linkserver.pyrite.internal.PyriteDefaults
+import androidx.compose.ui.unit.sp
+import jp.linkserver.pyrite.theme.*
+
+/** Optional, already localized metadata. Null fields are omitted, not replaced with invented values. */
+data class AboutOverviewContent(
+    val channel: AboutDetail? = null,
+    val build: AboutDetail? = null,
+    val version: AboutDetail? = null,
+    val attribution: AboutAttribution? = null
+)
+
+/** Attribution content only. Opening a link remains a host callback. */
+data class AboutAttribution(val prefix: String, val name: String, val url: String)
 
 /**
- * Pyrite's connected identity mosaic. Detail cards can open host-owned channel/build dialogs;
- * version is a separate action, never a click target nested inside another clickable card.
- * It stacks at narrow widths or enlarged font scales and does not fix text heights.
+ * Original spanning hero and two-column connected mosaic (20dp corners, 3dp gaps, 48dp bridges).
+ * The icon slot fills the source's circular 92dp viewport. Release text is formatted by the host.
+ * Scheduler's narrow-header fallback and content-sized lower cards prevent clipping at large fonts.
  */
 @Composable
 fun AboutOverviewMosaic(
-    info: AboutInfo, modifier: Modifier = Modifier, icon: @Composable (() -> Unit)? = null,
+    info: AboutInfo,
+    overview: AboutOverviewContent,
+    modifier: Modifier = Modifier,
+    icon: @Composable (() -> Unit)? = null,
     onVersionClick: (() -> Unit)? = null,
-    onDetailClick: ((AboutDetail) -> Unit)? = null
+    onChannelClick: (() -> Unit)? = null,
+    onAttributionClick: ((AboutAttribution) -> Unit)? = null
 ) {
-    require(info.details.map { it.key }.distinct().size == info.details.size) {
-        "About detail keys must be unique"
-    }
+    val nothing = LocalPyriteStyle.current == PyriteStyle.Nothing
+    val cardColor = MaterialTheme.colorScheme.surfaceContainerHigh
+    val gutterColor = if (nothing) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
+    val gap = 3.dp
     val fontScale = LocalDensity.current.fontScale
-    BoxWithConstraints(modifier.fillMaxWidth()) {
-        val stack = maxWidth < 420.dp || fontScale >= 1.5f
-        val hasDetails = info.details.isNotEmpty()
-        Column(verticalArrangement = Arrangement.spacedBy(PyriteDefaults.mosaicGap)) {
-            Surface(shape = PyriteDefaults.connectedShape(true, !hasDetails),
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(PyriteDefaults.cardPadding),
-                    verticalArrangement = Arrangement.spacedBy(PyriteDefaults.contentGap)) {
-                    icon?.invoke()
-                    Text(info.name, style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.semantics { heading() })
-                    if (onVersionClick == null) Text(info.version, style = MaterialTheme.typography.titleLarge)
-                    else TextButton(onClick = onVersionClick) {
-                        Text(info.version, style = MaterialTheme.typography.titleLarge)
+    BoxWithConstraints(modifier.widthIn(max = 520.dp).fillMaxWidth()) {
+        val squareSize = (maxWidth - gap) * .5f
+        val stackedHeader = maxWidth / fontScale < 320.dp
+        val channel = overview.channel
+        val hasRight = overview.build != null || overview.version != null
+        val hasLower = channel != null || hasRight
+        Column(verticalArrangement = Arrangement.spacedBy(gap)) {
+            SourceCard(onVersionClick, Modifier.fillMaxWidth().heightIn(min = 176.dp)) {
+                val identity: @Composable () -> Unit = {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(info.name,
+                                modifier = Modifier.semantics { heading() },
+                                style = if (nothing) LocalTextStyle.current else MaterialTheme.typography.headlineMedium,
+                                fontWeight = if (nothing) FontWeight.Normal else FontWeight.Bold,
+                                fontSize = if (nothing) 27.sp else 30.sp,
+                                lineHeight = if (nothing) 32.sp else 36.sp)
+                            overview.attribution?.let { attribution ->
+                                val active = onAttributionClick != null
+                                val linkColor = MaterialTheme.colorScheme.primary
+                                Text(buildAnnotatedString {
+                                    append(attribution.prefix); append(" ")
+                                    if (active) withLink(LinkAnnotation.Clickable(
+                                        attribution.url,
+                                        TextLinkStyles(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)),
+                                        { onAttributionClick?.invoke(attribution) }
+                                    )) { append(attribution.name) }
+                                    else append(attribution.name)
+                                }, style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 16.sp)
+                            }
+                        }
+                        if (info.version.isNotBlank()) Text(info.version,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = if (nothing) 21.sp else MaterialTheme.typography.bodyMedium.lineHeight)
+                        info.description?.takeIf { it.isNotBlank() }?.let {
+                            Text(it, style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
-                    info.description?.let {
-                        Text(it, style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+                }
+                val appIcon: @Composable (Modifier) -> Unit = { sizeModifier ->
+                    if (icon != null) Surface(sizeModifier, CircleShape,
+                        color = if (nothing) Color.White else MaterialTheme.colorScheme.surface,
+                        border = if (nothing) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null
+                    ) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { icon() } }
+                }
+                if (stackedHeader) Column(Modifier.padding(22.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    appIcon(Modifier.size(64.dp)); identity()
+                } else Row(Modifier.padding(horizontal = 24.dp, vertical = 22.dp),
+                    horizontalArrangement = Arrangement.spacedBy(22.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    appIcon(Modifier.size(92.dp))
+                    Box(Modifier.weight(1f)) { identity() }
                 }
             }
-            if (stack) {
-                info.details.forEachIndexed { index, detail ->
-                    key(detail.key) {
-                        DetailCell(detail, index == info.details.lastIndex,
-                            onClick = onDetailClick?.let { { it(detail) } })
+            if (hasLower) Row(
+                Modifier.fillMaxWidth().height(IntrinsicSize.Min).drawWithContent {
+                    drawContent()
+                    val gapPx = gap.toPx()
+                    val overlap = 1.dp.toPx()
+                    val bridge = 48.dp.toPx()
+                    val firstWidth = if (channel != null && hasRight) (size.width - gapPx) * .5f else size.width
+                    val start = (firstWidth - bridge) * .5f
+                    drawRect(cardColor, Offset(start, -gapPx - overlap), Size(bridge, gapPx + overlap * 2f))
+                    drawCircle(gutterColor, gapPx * .5f, Offset(start, -gapPx * .5f))
+                    drawCircle(gutterColor, gapPx * .5f, Offset(start + bridge, -gapPx * .5f))
+                    if (channel != null && hasRight) {
+                        val verticalStart = (size.height - bridge) * .5f
+                        drawRect(cardColor, Offset(firstWidth - overlap, verticalStart), Size(gapPx + overlap * 2f, bridge))
+                        drawCircle(gutterColor, gapPx * .5f, Offset(firstWidth + gapPx * .5f, verticalStart))
+                        drawCircle(gutterColor, gapPx * .5f, Offset(firstWidth + gapPx * .5f, verticalStart + bridge))
+                    }
+                }, horizontalArrangement = Arrangement.spacedBy(gap)
+            ) {
+                channel?.let {
+                    SourceCard(onChannelClick, Modifier.weight(1f).heightIn(min = squareSize).fillMaxHeight()) {
+                        Column(Modifier.fillMaxSize().padding(22.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                            Text(it.label, style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            StrongValue(it.value, nothing, Modifier.padding(top = 14.dp))
+                        }
                     }
                 }
-            } else {
-                // Pairs keep useful widths on tablets without compressing long metadata.
-                info.details.chunked(2).forEachIndexed { row, pair ->
-                    Row(Modifier.height(IntrinsicSize.Min),
-                        horizontalArrangement = Arrangement.spacedBy(PyriteDefaults.mosaicGap)) {
-                        pair.forEachIndexed { column, detail ->
-                            key(detail.key) {
-                                DetailCell(detail, row == (info.details.size - 1) / 2,
-                                    Modifier.weight(1f).fillMaxHeight(),
-                                    onDetailClick?.let { { it(detail) } },
-                                    leftEdge = column == 0, rightEdge = column == pair.lastIndex)
+                if (hasRight) SourceCard(onVersionClick, Modifier.weight(1f).heightIn(min = squareSize).fillMaxHeight()) {
+                    Column(Modifier.fillMaxSize().padding(22.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                        overview.build?.let {
+                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text(it.label, style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(it.value, style = MaterialTheme.typography.bodySmall, lineHeight = 16.sp)
+                            }
+                        }
+                        overview.version?.let {
+                            Column(Modifier.padding(top = if (overview.build != null) 14.dp else 0.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text(it.label, style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                StrongValue(it.value, nothing, dotted = nothing)
                             }
                         }
                     }
@@ -75,25 +165,14 @@ fun AboutOverviewMosaic(
     }
 }
 
-@Composable
-private fun DetailCell(
-    detail: AboutDetail, last: Boolean, modifier: Modifier = Modifier, onClick: (() -> Unit)?,
-    leftEdge: Boolean = true, rightEdge: Boolean = true
-) {
-    val body: @Composable () -> Unit = {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(detail.label, style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(detail.value, style = MaterialTheme.typography.titleMedium)
-        }
-    }
-    val connected = PyriteDefaults.connectedShape(false, last)
-    val inner = MaterialTheme.shapes.extraSmall
-    val shape = connected.copy(
-        bottomStart = if (leftEdge) connected.bottomStart else inner.bottomStart,
-        bottomEnd = if (rightEdge) connected.bottomEnd else inner.bottomEnd
-    )
+@Composable private fun StrongValue(value: String, nothing: Boolean, modifier: Modifier = Modifier, dotted: Boolean = false) {
+    Text(value, modifier, fontFamily = if (dotted) FontFamily.Monospace else null,
+        fontWeight = if (nothing) FontWeight.Normal else FontWeight.Bold, fontSize = 25.sp, lineHeight = 29.sp)
+}
+
+@Composable private fun SourceCard(onClick: (() -> Unit)?, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val color = MaterialTheme.colorScheme.surfaceContainerHigh
-    if (onClick == null) Surface(modifier.fillMaxWidth(), shape = shape, color = color, content = body)
-    else Surface(onClick, modifier.fillMaxWidth(), shape = shape, color = color, content = body)
+    val shape = RoundedCornerShape(20.dp)
+    if (onClick == null) Surface(modifier, shape, color, content = content)
+    else Surface(onClick, modifier, shape = shape, color = color, content = content)
 }

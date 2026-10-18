@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.compose.material.icons.core)
     if (providers.gradleProperty("pyrite.usePublishedArtifact").orNull == "true") {
         implementation("jp.linkserver:pyrite:0.1.0-SNAPSHOT")
     } else {

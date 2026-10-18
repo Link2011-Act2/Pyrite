@@ -1,64 +1,50 @@
-# UIカタログと標準デザイン
+# UIカタログ
 
-既存の :app が検証アプリです。最初の設定画面 → 右上の「UI」または「コンポーネント」からカテゴリを選びます。各カテゴリの右上「Aa」はスタイル、「◐」はライト／ダーク／システムの選択です。
+既存の :app が検証アプリです。最初の設定画面から「About」で画面プレビュー、「UI」または「コンポーネント」で部品カテゴリを開きます。右上「Aa」はスタイル、「◐」は明暗です。
 
-## デザインの責務
+## 現在のデザイン
 
-Pyriteが3スタイルの形状・間隔・文字の階層・モーションを管理します。利用側は文言・状態・callback・補足コンテンツを渡します。今回、角丸・行間・Switchの配色等をアプリ別に指定するAPIは追加していません。既存PyriteThemeの明示的なoverrideは互換性のため維持しますが、今後の移行では標準値を使います。Dynamic Color、システムの文字拡大、ライト／ダークは維持します。
+M3EはScheduler、Nothing風はGlyph Bartyを基準とします。ShutUpの帰属・更新カードも利用できます。形状・余白・文字階層はPyriteが管理し、恣意的な外観指定APIは増やしません。通常M3の独立スタイルは削除しました。詳細・元ファイル・元UIとの差分は[source-port.md](source-port.md)を参照してください。
 
-| スタイル | 標準の表現 |
-| --- | --- |
-| Material 3 | 公式ListItem、通常のMaterialThemeと標準モーション |
-| Material 3 Expressive | 公式MaterialExpressiveTheme、segmentedShapesとSegmentedListItemによる連結・押下変形、expressive motion、公式LoadingIndicator |
-| Nothing風 | 白黒の面と赤いアクセント、22/6dpの連結角丸、余裕のある独自行。専有フォントなし |
-
-Aboutは従来の左右独立カードから、3dp間隔で角の位置を揃えた連結モザイクに変更しました。ShutUp固有の48dpブリッジを再現するAPIは設けません。幅420dp未満または文字倍率1.5以上では縦積みにして、固定高・行数制限を使わず読みやすさを優先します。広幅の補足情報は2列です。通常のAboutOverviewも同じ標準表示を使います。モザイクのバージョン操作と各補足情報の操作は独立します。
+Aboutは左92dpアイコン・右アプリ情報の上段と、Channel／Build・Versionの下段2列、48dpの接続ブリッジです。SettingsGroupを流用していません。Nothing固有フォントは同梱していません。狭幅／文字拡大時はScheduler由来の縦ヘッダー・可変高へ切り替わります。
 
 ## 公開UIの確認先
 
-| 公開API | カタログの場所と条件 |
+| API | 確認先 |
 | --- | --- |
-| PyriteTheme / PyriteStyle | 最初の外観設定、各カテゴリのツールバー。3スタイル・明暗・システム・動的色 |
-| SettingsScreen | 最初の設定画面、各カテゴリ、複数グループの画面プレビュー |
-| SettingsGroup / item | 設定行：先頭・中間・末尾の表示を個別に切替。可視行だけから形状を計算 |
-| SettingsActionItem | 遷移例、カウンター、カテゴリへの導線。無効／長文、String summary |
-| SettingsSwitchItem | 通常のString summary、複数TextのsupportingContent。1つの操作対象、ON/OFF／無効 |
-| SettingsRadioItem | 単一選択グループ、補足slot、無効候補 |
-| SettingsInfoItem | 操作のない情報行 |
-| SettingsStatusItem | 状態行。読み込みの有無、Polite live region、進行中semantics |
-| SettingsInfoCard | 説明文と追加content |
-| SettingsActionCard | 全幅ボタン、補足content、無効／読み込み、操作回数 |
-| SettingsChoiceDialog / SettingsChoice | 選択・確認：下書き・確定・取消、長い説明、無効な候補 |
-| AboutScreen / AboutOverview / AboutInfo / AboutDetail / AboutLink | 最初のAbout画面：アプリ情報・関連リンク・ホストの追加セクション |
-| AboutOverviewMosaic | Aboutモザイク：長文、バージョン・チャネル・ビルドの操作、非操作表示 |
+| PyriteTheme / PyriteStyle | 外観設定、カテゴリ右上。M3E/Nothing、ライト/ダーク/システム、M3E Dynamic Color |
+| PyriteScreenScaffold / PyriteBackButton / PyriteScreenTransition | 全画面のヘッダーと単一遷移ホスト。[元UI・時間・API](navigation.md) |
+| SettingsScreen / SettingsGroup | 最初の画面、設定行、複数グループの画面プレビュー。先頭/中間/末尾を動的に省略 |
+| SettingsActionItem / SettingsNavigationItem | 設定行の遷移・カウンター・矢印 |
+| SettingsSwitchItem | String summaryと補足slot、ON/OFF・無効・長文 |
+| SettingsSplitSwitchItem | 設定行「元アプリの設定部品」。遷移とSwitchが別の操作 |
+| SettingsRadioItem / SettingsRadioGroupItem | 設定行。連結単一選択とGlyph由来の複合Radio |
+| SettingsInfoItem / SettingsStatusItem | 情報行、カードカテゴリの読み込み状態 |
+| SettingsInfoCard / SettingsActionCard | カードカテゴリ。補足内容・無効・進行中 |
+| SettingsChoice / SettingsChoiceDialog | ダイアログカテゴリ。下書き・確定・取消・無効候補 |
+| AboutScreen / AboutOverviewMosaic | About画面とAboutモザイクカテゴリ |
+| AboutOverviewContent / AboutAttribution | Aboutモザイク。Forked from表示・非表示、メタ情報未設定、長文、操作可否 |
+| AboutAction / AboutActionGroup | Aboutモザイク下部。連結した説明・全幅アクション |
+| AboutUpdateCard | Aboutモザイク下部。更新前/確認中/確認結果・操作不可 |
+| 公式Button/Slider/LoadingIndicator等 | 公式コントロール。再実装・ラッパーなし |
 
-ボタン、Slider、進捗、単一選択ボタン、展開は「公式コントロール」でMaterial 3を直接使用しています。確認ダイアログも公式AlertDialogの使用例です。Pyriteには同義のラッパーを追加していません。
+画面プレビューはONと実効状態、条件付き項目、確認後だけONにするSwitch、Radio、About遷移を組み合わせます。端末設定・ネットワーク・Preferences・既存アプリのロジックは操作しません。
 
-画面プレビューは複数グループ、ONと実効状態の分離、条件付き項目、ON時だけ確認するSwitch、Radio、Aboutへの遷移を組み合わせます。端末設定・ネットワーク・Preferences・既存アプリのロジックは操作しません。
+階層型設定カテゴリは一覧の分割Switchから詳細へ進み、マスターと下位項目を操作します。状態を共有し、OFFでも背景を維持します。APIと参考画像との差分は[hierarchical-settings.md](hierarchical-settings.md)を参照してください。
 
-## 状態とslotの契約
+## 状態と検証手順
 
-- ライブラリは状態を保存しません。確定値、ダイアログ下書き、処理中、表示条件はホストの責任です。
-- カタログではrememberSaveableと画面／カテゴリごとのSaveableStateHolderを使います。テーマ・明暗・カテゴリ移動・Activity再生成でも値を保持します。Sliderの値も保存対象です。
-- 設定行のsupportingContentは補足情報用です。親行と重複するSwitchやButtonを入れず、独立した操作には別行・アクションカードを使います。
-- 説明カードのcontentはライブラリの内側余白と文字階層を使います。独自の画面全体やテーマをslotに入れる用途ではありません。
-- 行のkeyは安定・一意にします。非表示にする行はitemを登録しません。非表示中も残す値はホストに保持します。
+- ホストが確定値・下書き・進行中・表示条件を所有します。カタログはrememberSaveableと単一のPyriteScreenTransition内の画面キーごとのSaveableStateHolderを使用します。
+- 外観でM3E/Nothingと明暗を往復し、操作状態が維持されることを確認します。Dynamic ColorはAndroid 12以降のM3Eで試せます。
+- 最初の画面の150%文字・360dp幅を試します。OSの文字/表示サイズもAndroid設定から変更してください。アプリ内文字倍率はOS倍率に乗算されます。
+- 設定行の長文、無効、先頭/中間/末尾を素早く切り替え、形状と値を確認します。
+- 選択ダイアログの取消/戻る/確定、確認ダイアログのガードとOFF即時反映を試します。
+- AboutモザイクでForked fromとメタ情報を省略し、長文・リンク無効・確認中を試します。
+- テーマ変更、カテゴリ往復、画面回転、Activity再生成で値を確認します。
+- TalkBackで見出し・各Role・選択/無効・状態通知・リンク・ダイアログフォーカスを確認します。自動semanticsテストは実際のTalkBack操作を代替しません。
 
-## 手動で確認する手順
+補足slotへ親と競合する操作を入れず、独立操作には専用分割行・アクションカードを使ってください。可視行のkeyは一意・安定にします。
 
-1. 外観で各スタイルとライト／ダークを選び、設定・About・各カテゴリを確認します。Dynamic ColorはAndroid 12以上のM3/M3Eで確認します。
-2. 最初の画面で150%文字、360dp幅を切り替えます。実際のOSの文字／表示サイズはAndroid設定で変更し、最大文字・横画面・広幅のエミュレーターでも確認します。アプリ内倍率は端末のfontScaleに乗算されます。
-3. 設定行で長文、無効、先頭／中間／末尾の全組合せを試します。素早く切替え、最後の状態・連結形状・操作回数を確認します。
-4. 選択ダイアログで選択後に取消／戻る／外側タップを試します。確定まで元の値を保つこと、無効候補を選べないことを確認します。
-5. 確認ダイアログは確認済みSwitchをONにするまで確定不可です。画面プレビューでは取消でOFF、確定でON、OFFは即時反映です。
-6. カテゴリ内の値を変え、テーマ・別カテゴリ・Activity再生成を往復します。Android開発者向け設定「アクティビティを保持しない」も確認方法の一つです。
-7. TalkBackで見出し順、SwitchのON/OFF・無効、Radioの選択、状態変化、ボタン名、戻るとダイアログのフォーカス復帰を確認します。拡大時にスクロールできること、操作が二重発火しないことを確認します。
+元関数を抽出した比較fixtureはandroidTest内だけにあります。SourceParityTestが同条件の画像と差分を保存します。比較範囲と実績は[verification.md](verification.md)を参照してください。
 
-自動検証と未検証項目の実績は [verification.md](verification.md) を参照してください。semanticsテストはTalkBackの実操作を代替しません。
-
-M3Eの公式SegmentedListItemの既定背景はSurfaceです。カタログ画像では画面背景と同化して連結形状が見えにくかったため、Pyrite標準では公式ListItemDefaults.segmentedColorsで通常・無効のcontainerをsurfaceContainerHighへ揃えました。選択色・押下形状・モーションは公式実装を使用します。外部から色を変える新APIは追加していません。通常M3の平面的なリスト表示と区別できます。
-
-PyriteThemeは公式のM3Eテーマと通常テーマを切り替えるため内部の親構造が異なります。公式movableContentOfとrememberUpdatedStateで内容のidentityと最新lambdaを保ち、カテゴリや局所UI状態が切替で失われない構成にしています。設定保存の責務はホストのままです。参照：[AndroidX Movable Content設計](https://android.googlesource.com/platform/frameworks/support/+/refs/heads/androidx-main/compose/runtime/design/movable-content.md)。
-
-
-説明・アクションカードはSettingsScreenの独立した節として配置します。連結グループの行にはSettings…Itemを使用してください。
+設定→About→「導入方法」からビルド情報詳細を開けます。進む／戻るのスライド、スクロール・表示設定の復元、連続した画面操作とActivity再生成を確認してください。カテゴリ内にも別の画面遷移ホストを置く構成は廃止しました。

@@ -2,7 +2,7 @@
 複数のAndroidアプリで共通利用する、Jetpack Composeの設定画面・About画面ライブラリです。
 
 - Android Library `:pyrite`：状態を外部から渡す設定UIとAbout表示。
-- UI検証カタログ `:app`：部品別の操作例、画面プレビュー、3スタイル、明暗、文字拡大と狭幅。
+- UI検証カタログ `:app`：部品別の操作例、画面プレビュー、M3E／Nothing風の2スタイル、明暗、文字拡大と狭幅。
 - 独立した利用検証プロジェクト `verification/consumer`：発行済みMavenアーティファクトのみを参照。
 
 Material 3の基本部品は直接利用してください。Pyriteは、設定行の操作・グループ構造・About構成など、アプリをまたぐ価値のある組み合わせを提供します。
@@ -102,10 +102,10 @@ maven {
 `app/build.gradle.kts`：
 
 ```kotlin
-implementation("com.github.Link2011-Act2:Pyrite:4244bed7b36aa084c89d14338f176dbf87c0f263")
+implementation("com.github.Link2011-Act2:Pyrite:<current-api-commit-sha>")
 ```
 
-このSHAは初期APIの配布検証版です。今回追加したカード・状態行・操作付きモザイクには新しい固定SHAが必要です。現在の追加APIはソース／ローカルMaven版で検証してください。
+公開確認済み4244bedは初期APIの証跡です。上のプレースホルダーには、現行APIを含むcommitを公開後にその固定SHAを指定してください。今回のAPI整理を含む変更はソース／ローカルMaven版で検証してください。
 
 利用アプリ側でPyriteのソースを取得する必要はありません。SDK・Compose Compilerの要件は上記を参照してください。
 
@@ -113,7 +113,7 @@ implementation("com.github.Link2011-Act2:Pyrite:4244bed7b36aa084c89d14338f176dbf
 # 専用ローカルMavenでJitPack座標とPOMの推移依存を検証
 .\scripts/verify-jitpack.ps1
 # 公開反映後、固定commit SHAまたは承認済み0.x.xタグで取得・ビルド
-.\scripts/verify-jitpack.ps1 -Revision '4244bed7b36aa084c89d14338f176dbf87c0f263'
+.\scripts/verify-jitpack.ps1 -Revision '<current-api-commit-sha>'
 ```
 
 利用側のリポジトリ設定、公開前の条件、クリーンビルドの手順は[配布ドキュメント](docs/distribution.md)を参照してください。[検証結果](docs/verification.md)に実施済み・未検証の範囲を記載しています。
@@ -215,51 +215,56 @@ SettingsActionCard(
 
 カードのimportは `jp.linkserver.pyrite.card.*` です。SettingsInfoItemは操作のない情報、SettingsInfoCardは説明と追加contentを表示します。Action/Switch/Radio行には既存のString summary版を維持し、補足Composable用のoverloadを追加しています。補足slotに親と競合する操作対象を入れないでください。
 
-`AboutOverviewMosaic(info, onVersionClick = …, onDetailClick = …)` でバージョン・補足カードの操作をホストに委譲できます。通常のAboutOverviewも同じ標準モザイクを表示します。
+AboutOverviewMosaicとAboutOverviewContentでChannel / Build / Versionを明示し、任意のForked fromを表示できます。元の92dpアイコン・48dpブリッジを維持します。情報は名前付きのchannel/build/versionへ渡し、未設定のフィールドは省略します。Build/Versionの操作は右カード共通のonVersionClickとなります。[元UIとAPIの差分](docs/source-port.md)を確認してください。
 
 ## UI検証アプリ
 
 既存の :app は、設定行／カード／ダイアログ／Aboutモザイク／画面プレビュー／公式コントロールを操作できるカタログです。カテゴリ内の右上でテーマ・明暗を切り替え、最初の設定画面で150%文字・360dp幅を選べます。状態は画面移動・テーマ切替・Activity再生成後も保持します。
 
-Pyriteが形状・余白・文字階層を管理します。アプリ別の意匠指定を増やさず、移行先は標準デザインに統一します。検証条件と全公開UIの対応表は [カタログガイド](docs/catalog.md)、ShutUpの振る舞いを保つ手順は [移行計画](docs/shutup-migration-plan.md) を参照してください。
+Pyriteが形状・余白・文字階層を管理します。アプリ別の意匠指定を増やさず、SchedulerのM3E／Glyph BartyのNothing風UIを基準に忠実に共通化します。元コード・差分は [移植記録](docs/source-port.md) を参照してください。検証条件と全公開UIの対応表は [カタログガイド](docs/catalog.md)、ShutUpの振る舞いを保つ手順は [移行計画](docs/shutup-migration-plan.md) を参照してください。
 
 ## About画面
 
 ```kotlin
 AboutScreen(
     title = "アプリについて",
-    info = AboutInfo(
-        name = "My App",
-        version = "1.2.3",
-        description = "アプリの説明",
-        details = listOf(
-            AboutDetail("build", "ビルド", "123"),
-            AboutDetail("channel", "チャンネル", "Beta")
-        )
+    info = AboutInfo(name = "My App", version = "Beta  v1.2.3 (123)"),
+    overview = AboutOverviewContent(
+        channel = AboutDetail("Channel", "Beta"),
+        build = AboutDetail("Build", "123"),
+        version = AboutDetail("Version", "v1.2"),
+        attribution = AboutAttribution("Forked from", "Upstream", "https://example.com/upstream")
     ),
-    linksTitle = "関連リンク",
-    links = listOf(
-        AboutLink("website", "Webサイト", "https://example.com")
-    ),
-    onLinkClick = { link -> openUrlInHost(link.url) },
+    links = listOf(AboutLink("website", "Webサイト", "https://example.com")),
+    onLinkClick = { openUrlInHost(it.url) },
+    onAttributionClick = { openUrlInHost(it.url) },
     navigationIcon = { /* アプリ側の戻るボタン */ },
-    icon = { /* アプリ側の画像・ロゴ */ }
+    icon = { /* 92dpの丸い領域を満たすアプリアイコン */ }
 ) {
-    // 更新状態や独自セクションなど、アプリが管理する表示
+    AboutUpdateCard(
+        description = "アプリの更新情報を確認します",
+        status = statusText,
+        actionLabel = if (checking) "確認中…" else "更新を確認",
+        onCheck = onCheck,
+        checking = checking,
+        hasResult = hasResult
+    )
 }
 ```
 
-`jp.linkserver.pyrite.about.*`をimportします。`AboutOverview`だけを既存画面へ配置することもできます。アプリ名・バージョン取得、更新チェック、URL起動、エラー処理をPyriteは行いません。
+`jp.linkserver.pyrite.about.*`をimportします。`AboutOverviewMosaic`だけを既存画面へ配置することもできます。アプリ名・バージョン取得、更新チェック、URL起動、エラー処理をPyriteは行いません。
+
+階層型設定にはSettingsMasterSwitchとSettingsSplitSwitchItemを利用できます。背景色はON/OFFで固定し、下位のenabledはホストが渡します。[API例と参考画像との差分](docs/hierarchical-settings.md)を参照してください。
 
 ## テーマとアクセシビリティ
 
-`PyriteStyle.Material3` / `Material3Expressive` / `Nothing`を選択できます。
+`PyriteStyle.Material3Expressive` / `PyriteStyle.Nothing`を選択できます。
 
-M3Eは公式`MaterialExpressiveTheme`、`MotionScheme`、`SegmentedListItem`、`ListItemDefaults.segmentedShapes`を使用します。通常M3も公式の操作可能な`ListItem`を使用します。Nothing風では白黒・赤、22dp/6dpの連結角丸、密なカード配置を維持します。
+M3Eは公式MaterialExpressiveTheme、MotionScheme、Switchを使用し、Scheduler由来の22/6dp連結行・Check/Closeの意匠を維持します。Nothing風はGlyph由来の白黒・赤、通常ウェイト、連結カードです。SegmentedListItemは元の形状・余白を変えるため設定行には使いません。
 
 - `darkTheme`の明示指定とダイナミックカラーに対応します。Nothing風ではダイナミックカラーを使用しません。
-- 既存の`colorScheme`、`typography`、`shapes`指定は互換性のため維持します。今後の移行はPyrite標準値を使います。
-- `nothingFontFamily`でホストが許諾を得た書体を指定できます。専有フォントは同梱していません。
+- 色・形状・文字はPyrite標準値を使います。テーマ入力はstyle、darkTheme、dynamicColorです。
+- Nothing風はシステム書体を使い、専有フォントは同梱していません。OSの文字拡大に対応します。
 - 設定値・テーマ選択はホストで保持します。テーマの変更でライブラリが設定を初期化することはありません。
 - 固定の行高に依存せず、文言を折り返します。Aboutは狭幅・大きい文字で縦並びに切り替わります。
 - 見出し、Switch/Radioの操作属性、無効状態を設定します。
@@ -272,12 +277,12 @@ TalkBackによる読み上げ全体と多様な端末・フォントでの確認
 | パッケージ | API |
 | --- | --- |
 | `theme` | `PyriteStyle`, `PyriteTheme` |
-| `settings` | `SettingsScreen`, `SettingsGroup`, `SettingsGroupScope.item`, `SettingsActionItem`, `SettingsSwitchItem`, `SettingsRadioItem`, `SettingsInfoItem`, `SettingsStatusItem` |
+| `settings` | `SettingsScreen`, `SettingsGroup`, `SettingsGroupScope.item`, `SettingsActionItem`, `SettingsSwitchItem`, `SettingsRadioItem`, `SettingsInfoItem`, `SettingsStatusItem`, `SettingsNavigationItem`, `SettingsRadioGroupItem`, `SettingsMasterSwitch`, `SettingsSplitSwitchItem` |
 | `card` | `SettingsInfoCard`, `SettingsActionCard` |
 | `dialog` | `SettingsChoice<T>`, `SettingsChoiceDialog<T>` |
-| `about` | `AboutInfo`, `AboutDetail`, `AboutLink`, `AboutScreen`, `AboutOverview`, `AboutOverviewMosaic` |
+| `about` | `AboutInfo`, `AboutDetail`, `AboutLink`, `AboutScreen`, `AboutOverviewMosaic`, `AboutOverviewContent`, `AboutAttribution`, `AboutAction`, `AboutActionGroup`, `AboutUpdateCard` |
 
-通常のButton、Card、Slider、Switch、LoadingIndicator等を再公開する独自ラッパーは用意していません。
+通常のButton、Card、Slider、Switch、LoadingIndicator等を再公開する独自ラッパーは用意していません。[APIの使い分けと削除対応表](docs/public-api.md)を参照してください。
 
 ## 検証
 
@@ -295,7 +300,7 @@ Glyph Barty、NITTC Scheduler、ShutUpは参照のみで、変更していませ
 今回の基盤以降の候補：
 
 1. 設定の数値・文字・時刻編集、検証・エラー表示。
-2. 遷移とSwitchが独立した複合設定行、展開可能な設定セクション。
+2. 展開可能な設定セクション（分割Switch行・マスターSwitchは実装済み）。
 3. データ外部指定のOSS一覧。アクション・状態カードは実装済みです。
 4. 公式FABメニュー・ツールバーとの接続例、状態モーフの薄い構成。
 5. Markdownなど追加依存が必要な表示の採否。

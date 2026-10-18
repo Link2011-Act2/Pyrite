@@ -1,11 +1,6 @@
 package jp.linkserver.projectpyrite
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
@@ -13,7 +8,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -26,66 +20,59 @@ import jp.linkserver.pyrite.card.*
 import jp.linkserver.pyrite.dialog.*
 import jp.linkserver.pyrite.settings.*
 import jp.linkserver.pyrite.theme.PyriteStyle
+import jp.linkserver.pyrite.screen.PyriteBackButton
 
-private enum class CatalogSection(val title: Int, val description: Int) {
-    Index(R.string.components, R.string.catalog_index_intro),
-    Rows(R.string.catalog_rows, R.string.rows_description),
-    Cards(R.string.catalog_cards, R.string.cards_description),
-    Dialogs(R.string.catalog_dialogs, R.string.dialogs_description),
-    Mosaic(R.string.catalog_mosaic, R.string.mosaic_description),
-    Screens(R.string.catalog_screens, R.string.screens_description),
-    Official(R.string.catalog_official, R.string.official_components)
-}
-
-/** App-owned routing and retained interaction state; none of this belongs to the AAR. */
+/** Content only: the catalog root owns the single transition host and all destinations. */
 @Composable
 internal fun ComponentsPage(
-    style: PyriteStyle, onBack: () -> Unit, onStyle: () -> Unit,
-    onColorMode: () -> Unit, onAbout: () -> Unit
+    section: CatalogPage, style: PyriteStyle, onBack: () -> Unit, onStyle: () -> Unit,
+    onColorMode: () -> Unit, onAbout: () -> Unit, onSection: (CatalogPage) -> Unit,
+    hierarchyEnabled: Boolean, onHierarchyEnabledChange: (Boolean) -> Unit,
+    hierarchyUndo: Boolean, onHierarchyUndoChange: (Boolean) -> Unit,
+    hierarchyToggles: Int, hierarchyNavigations: Int, onOpenHierarchy: () -> Unit
 ) {
-    var section by rememberSaveable { mutableStateOf(CatalogSection.Index) }
-    val states = rememberSaveableStateHolder()
-    val back = { if (section == CatalogSection.Index) onBack() else section = CatalogSection.Index }
-    BackHandler { back() }
-    AnimatedContent(section, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "Catalog section") { shown ->
-        states.SaveableStateProvider(shown.name) {
-            SettingsScreen(
-                title = stringResource(shown.title), navigationIcon = { BackButton(back) },
-                actions = {
-                    val styleLabel = stringResource(R.string.design_style)
-                    val modeLabel = stringResource(R.string.color_mode)
-                    IconButton(onStyle, Modifier.semantics { contentDescription = styleLabel }) {
-                        Text("Aa", Modifier.clearAndSetSemantics {})
-                    }
-                    IconButton(onColorMode, Modifier.semantics { contentDescription = modeLabel }) {
-                        Text("◐", Modifier.clearAndSetSemantics {})
-                    }
-                }
-            ) {
-                Text(stringResource(shown.description), style = MaterialTheme.typography.bodyLarge)
-                when (shown) {
-                    CatalogSection.Index -> {
-                        SettingsGroup(title = stringResource(R.string.catalog_categories)) {
-                            CatalogSection.entries.filter { it != CatalogSection.Index }.forEach { entry ->
-                                item(entry.name) {
-                                    SettingsActionItem(stringResource(entry.title),
-                                        onClick = { section = entry },
-                                        summary = stringResource(entry.description),
-                                        trailingContent = { Text("›", Modifier.clearAndSetSemantics {}) })
-                                }
-                            }
-                        }
-                        SettingsInfoCard(stringResource(R.string.verification_guide),
-                            stringResource(R.string.verification_body))
-                    }
-                    CatalogSection.Rows -> RowsCatalog()
-                    CatalogSection.Cards -> CardsCatalog()
-                    CatalogSection.Dialogs -> DialogsCatalog()
-                    CatalogSection.Mosaic -> MosaicCatalog(style)
-                    CatalogSection.Screens -> ScreenPreview(onAbout)
-                    CatalogSection.Official -> OfficialComponentsContent(style)
-                }
+    SettingsScreen(
+        title = stringResource(section.title),
+        navigationIcon = { PyriteBackButton(onBack, stringResource(R.string.back)) },
+        actions = {
+            val styleLabel = stringResource(R.string.design_style)
+            val modeLabel = stringResource(R.string.color_mode)
+            IconButton(onStyle, Modifier.semantics { contentDescription = styleLabel }) {
+                Text("Aa", Modifier.clearAndSetSemantics {})
             }
+            IconButton(onColorMode, Modifier.semantics { contentDescription = modeLabel }) {
+                Text("◐", Modifier.clearAndSetSemantics {})
+            }
+        }
+    ) {
+        if (section != CatalogPage.HierarchyDetails) Text(stringResource(section.description),
+            style = MaterialTheme.typography.bodyLarge)
+        when (section) {
+            CatalogPage.Components -> {
+                SettingsGroup(title = stringResource(R.string.catalog_categories)) {
+                    CatalogPage.categories.forEach { entry ->
+                        item(entry.name) {
+                            SettingsNavigationItem(stringResource(entry.title),
+                                onClick = { onSection(entry) }, summary = stringResource(entry.description))
+                        }
+                    }
+                }
+                SettingsInfoCard(stringResource(R.string.verification_guide),
+                    stringResource(R.string.verification_body))
+            }
+            CatalogPage.Rows -> RowsCatalog()
+            CatalogPage.Cards -> CardsCatalog()
+            CatalogPage.Dialogs -> DialogsCatalog()
+            CatalogPage.Mosaic -> MosaicCatalog(style)
+            CatalogPage.Screens -> ScreenPreview(onAbout)
+            CatalogPage.Hierarchy, CatalogPage.HierarchyDetails -> HierarchyCatalog(
+                detail = section == CatalogPage.HierarchyDetails,
+                enabled = hierarchyEnabled, onEnabledChange = onHierarchyEnabledChange,
+                undo = hierarchyUndo, onUndoChange = onHierarchyUndoChange,
+                toggles = hierarchyToggles, navigations = hierarchyNavigations,
+                onOpenDetail = onOpenHierarchy)
+            CatalogPage.Official -> OfficialComponentsContent(style)
+            else -> error("Not a component destination: $section")
         }
     }
 }
@@ -134,6 +121,24 @@ private fun ColumnScope.RowsCatalog() {
         if (showLast) item("info") {
             SettingsInfoItem(stringResource(R.string.read_only),
                 summary = pluralStringResource(R.plurals.counter_value, clicks, clicks))
+        }
+    }
+    SettingsGroup(title = stringResource(R.string.source_settings)) {
+        item("navigation") {
+            SettingsNavigationItem(stringResource(R.string.navigation_row), { clicks++ },
+                summary = pluralStringResource(R.plurals.counter_value, clicks, clicks), enabled = enabled)
+        }
+        item("split") {
+            SettingsSplitSwitchItem(stringResource(R.string.split_navigation), checked, { checked = it },
+                onClick = { clicks++ }, navigationEnabled = enabled, switchEnabled = enabled)
+        }
+        item("compound-radio") {
+            SettingsRadioGroupItem(stringResource(R.string.single_selection),
+                listOf(SettingsChoice("one", 0, stringResource(R.string.option_one)),
+                    SettingsChoice("two", 1, stringResource(R.string.option_two)),
+                    SettingsChoice("disabled", 2, stringResource(R.string.disabled_setting), enabled = false)),
+                selected, { selected = it }, enabled = enabled,
+                summary = stringResource(R.string.rich_summary))
         }
     }
     SettingsGroup(title = stringResource(R.string.single_selection), modifier = Modifier.selectableGroup()) {
@@ -224,24 +229,50 @@ private fun ColumnScope.DialogsCatalog() {
 private fun ColumnScope.MosaicCatalog(style: PyriteStyle) {
     var longText by rememberSaveable { mutableStateOf(false) }
     var interactive by rememberSaveable { mutableStateOf(true) }
+    var attribution by rememberSaveable { mutableStateOf(true) }
+    var metadata by rememberSaveable { mutableStateOf(true) }
+    var checking by rememberSaveable { mutableStateOf(false) }
+    var checked by rememberSaveable { mutableStateOf(false) }
     var detail by rememberSaveable { mutableStateOf<String?>(null) }
     SettingsGroup(title = stringResource(R.string.test_conditions)) {
         item("long") { SettingsSwitchItem(stringResource(R.string.long_text), longText, { longText = it }) }
         item("interactive") { SettingsSwitchItem(stringResource(R.string.interactive_metadata), interactive, { interactive = it }) }
+        item("fork") { SettingsSwitchItem(stringResource(R.string.show_attribution), attribution, { attribution = it }) }
+        item("metadata") { SettingsSwitchItem(stringResource(R.string.show_metadata), metadata, { metadata = it }) }
+        item("checking") { SettingsSwitchItem(stringResource(R.string.loading_preview), checking, { checking = it }) }
     }
     AboutOverviewMosaic(
         info = AboutInfo(
             name = if (longText) stringResource(R.string.long_title) else "Pyrite",
-            version = "0.1.0-SNAPSHOT",
-            description = stringResource(if (longText) R.string.long_description else R.string.about_description),
-            details = listOf(
-                AboutDetail("channel", stringResource(R.string.release_channel), "Preview"),
-                AboutDetail("build", stringResource(R.string.build_info), "2026.10.18"),
-                AboutDetail("style", stringResource(R.string.design_style), styleLabel(style))
-            )
-        ), icon = { PyriteMark() },
+            version = "Preview  v0.1.0-SNAPSHOT (1)"
+        ),
+        overview = AboutOverviewContent(
+            channel = if (metadata) AboutDetail("Channel",
+                if (longText) stringResource(R.string.long_title) else "Preview") else null,
+            build = if (metadata) AboutDetail("Build",
+                if (longText) stringResource(R.string.long_description) else "2026.10.18") else null,
+            version = if (metadata) AboutDetail("Version", "v0.1") else null,
+            attribution = if (attribution) AboutAttribution("Forked from", "Upstream project", "https://example.org/upstream") else null
+        ),
+        icon = { PyriteMark() },
         onVersionClick = if (interactive) { { detail = "0.1.0-SNAPSHOT" } } else null,
-        onDetailClick = if (interactive) { { detail = it.label + "\n" + it.value } } else null
+        onChannelClick = if (interactive) { { detail = "Preview" } } else null,
+        onAttributionClick = if (interactive) { { detail = it.name + "\n" + it.url } } else null
+    )
+    AboutUpdateCard(
+        description = stringResource(if (longText) R.string.long_description else R.string.action_card_description),
+        status = stringResource(if (checking) R.string.checking else if (checked) R.string.state_ready else R.string.status_description),
+        actionLabel = stringResource(if (checking) R.string.checking else R.string.check_now),
+        onCheck = { checked = true }, checking = checking, hasResult = checked, enabled = interactive
+    )
+    AboutActionGroup(
+        actions = listOf(
+            AboutAction("support", stringResource(R.string.resources), stringResource(R.string.about_description),
+                stringResource(R.string.resources), interactive),
+            AboutAction("licenses", stringResource(R.string.integration),
+                if (longText) stringResource(R.string.long_description) else stringResource(R.string.supporting_slot),
+                stringResource(R.string.integration), interactive)
+        ), onAction = { detail = it.title }
     )
     if (detail != null) AlertDialog(onDismissRequest = { detail = null },
         title = { Text(stringResource(R.string.build_info)) }, text = { Text(detail.orEmpty()) },

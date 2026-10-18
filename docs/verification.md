@@ -1,5 +1,127 @@
 # 検証結果
 
+## 最新：公開API整理（2026-10-18）
+
+互換APIと順序依存のAbout adapterを削除しました。[削除対応表・維持理由・現行使用例](public-api.md)を参照してください。通常M3は独立スタイルに戻していません。標準の形状・余白・文字・状態管理方針、依存版とMaven/JitPack設定は維持しています。
+
+| 検証 | 結果 |
+| --- | --- |
+| release AAR / カタログdebug APK / androidTest APK | 成功 |
+| 既存JVMテスト | 1件成功 |
+| ライブラリrelease Lint | 問題なし |
+| カタログdebug Lint（テスト修正後も実行） | エラー0、依存更新通知9件 |
+| 通常ローカルMaven | 最終AAR発行、新APIの独立consumer、Maven版カタログのビルド成功 |
+| JitPack座標のローカルPOM-only consumer | clean / no-build-cache / refresh-dependenciesで成功。Pyriteソースを含まない独立ディレクトリで38タスク実行 |
+| 公開API | javapで旧名・旧Aboutプロパティ・互換オーバーロードの削除を確認。実装・カタログ・テスト・consumerの旧API参照0件 |
+| 公開物 | MIT / NOTICE同梱。sourcesは13 Kotlinファイル、テストfixture混入0件。専有フォントなし |
+| 変更前後の見た目 | 元UI比較用のPyrite画像14枚すべてが前回のPNGハッシュと一致 |
+
+AAR SHA-256：`2F9B062E998099E92AF6B7F2C2CA42617DB4FCBA642E0997A5A9C26F9BDEAA49`。最終通常Maven、JitPack座標のローカル発行、release出力のAARは一致しています。
+
+### 対象を絞ったUI検証
+
+API 35の読み取り専用Pixel_6a AVD、720×1280px / density 240で、**14種類が成功（分割実行）**しました。
+
+- SourceParityTest 6件：元UI画像、分割操作の有効条件、任意情報、Radio、帰属リンクの独立操作、新しいAboutScreenの明示メタ情報・補足slot・URL callback。
+- MasterSwitchTest 2件：4テーマの固定背景・下位値/disabled・単一callback、幅280dp/文字200%。
+- PyriteComponentsTest 2件：スタイル/明暗切替時のホスト状態、幅280dp/文字200%のAbout（4テーマ）。
+- PyriteExtendedComponentsTest 2件：ChannelとVersionの独立操作、テーマ境界でのローカル状態と最新callback。
+- CatalogFlowTest 2件：設定→About→部品とActivity再生成、階層画面の共有状態・テーマ切替・再生成。
+
+初回14件は13件成功、マスター背景の待機1件が失敗しました。前のタップのリップルが残ったテーマ切替直後の画像を基準にしていたためです。失敗時のダークON画像はprimary `#8DD3EE`に対し`#95D6EF`で、一時的な合成色でした。ONとOFFの両方で実際のテーマprimaryに収束してから比較するよう修正し、失敗した1件だけを再実行して成功しました（32.578秒）。色の比較精度やcallback/disabledの検証は緩めていません。ライブラリの背景・描画実装は変更していません。
+
+テーマ上書き削除・Nothing typographyの固定化・説明文style共通化が表示に影響しないことを、既存の元UI比較テスト1件（14表示条件）で再確認しました。12条件は元fixtureと完全一致、Nothing Aboutの明暗2条件だけ既知の35px差（約0.012%）です。さらに整理前後のPyrite PNG全14枚は完全一致しました。画像比較以外の成功済みテスト全件は再実行していません。
+
+### 証跡と残る範囲
+
+- build/api-cleanup-build.txt：AAR / APK / unit / Lint。
+- build/api-cleanup-final-maven.txt：最終発行 / 独立consumer / Maven版カタログ。
+- build/api-cleanup-jitpack-local.txt：JitPack座標 / POM-only clean consumerと推移依存。
+- build/api-cleanup-final-checks.txt、api-cleanup-ui-recheck-build.txt：配布版テストAPK / Lint。
+- build/api-cleanup-ui.txt：初回14件（13成功、待機1失敗）。
+- build/api-cleanup-ui-recheck.txt：待機修正後の1件成功。
+- build/api-cleanup-signatures.txt：公開シグネチャ。
+- build/verification/api-cleanup-ui/PyriteVerification/：元UI比較・文字拡大・初回マスター画像。
+- build/verification/api-cleanup-recheck/PyriteVerification/：修正後のマスター4テーマON/OFF画像。
+
+新APIを含むcommitのリモートJitPack取得は未実施です。今回の変更は未コミット・未Pushで、タグ・Release・Actions・自動実行は変更していません。旧公開SHAの取得記録は過去の証跡として保持しています。TalkBack実操作、API 26・メーカー実機、プロセス終了後の復元は未実施です。接続実機は操作せず、AVDとGradleは順次実行しました。
+
+既存3アプリは変更していません。Glyph/ShutUpはclean、Schedulerの既存変更3ファイルは保持しています。以下は前回までの記録であり、旧APIへの互換性を表すものではありません。
+
+
+## 前回：既存UI移植と階層型設定（2026-10-18）
+
+現行はM3EとNothingの2スタイルです。以下の旧3スタイル・SegmentedListItemの記録は過去の実装時点の履歴であり、現在の方針は[source-port.md](source-port.md)を正とします。
+
+### ビルド・配布
+
+| 確認 | 結果 |
+| --- | --- |
+| release AAR / debugカタログAPK / androidTest APK | 成功 |
+| JVM | 既存1件成功。以降、対象のグループDSLロジックは変更しておらず不要な再実行を省略 |
+| ライブラリrelease Lint | 問題なし |
+| カタログdebug Lint | エラー0、依存更新通知9件。通常M3廃止に伴う未使用リソース2件は削除 |
+| 最終ローカルMaven | AAR・POM・sources・module metadataを発行。独立consumerとMaven版カタログのビルド成功 |
+| JitPack座標のPOM-only独立consumer | ローカル形式のclean取得・ビルド成功。Material 3 beta01とicons-core 1.7.8の推移依存を確認 |
+| ライセンス・アセット | AARのclasses.jarにMIT / NOTICE。フォント0件。sources JARは13 Kotlinファイル、比較fixture混入0件 |
+
+最終AAR SHA-256：`5A3EDE8AAA0A4FE91FF8708390525FF5D522DBF6643CDBB70714262B60BB43E9`。
+
+Material 3 1.5.0-beta01 / Compose 1.12.0 / SDK 37 / AGP 9.4.1 / JDK 21は維持しています。Check/Closeと自動反転矢印のためGoogle material-icons-core 1.7.8を追加しました。
+
+JitPackのPOM取得検証後の最終変更は表示上限・旧Aboutの補足情報・文字拡大時の角丸・空の説明の省略であり、依存と配布設定は変えていません。最終AARは通常のローカルMavenで再発行・利用確認しました。新しい固定SHAのリモート取得は未実施です。既存の公開確認済み4244bedの記録は下に保持します。今回の変更は未コミット・未Pushで、タグ・Release・Actions・自動実行の変更はありません。
+
+### UIテスト
+
+API 35 Pixel_6a、720×1280px、density 240（画面幅480dp）の読み取り専用AVDです。接続実機を操作せず、GradleとAVDを同時実行していません。
+
+**計22種類のUIテストが成功（分割実行）**：
+
+- PyriteComponentsTest 5件、PyriteExtendedComponentsTest 4件：既存の操作・状態・無効化・キー・ダイアログ・アニメーション・幅280dp/文字200%のAbout。
+- CatalogFlowTest 5件：設定/About/部品、2スタイル×明暗、Activity再生成、カテゴリ復元、確認ガード、新しい階層画面の共有状態。
+- SourceParityTest 6件：元関数との画像比較、分割行の独立操作、情報省略と更新中の無効化、複合Radio、帰属リンクとVersion操作の分離、旧Aboutの4件目以降の保持。
+- MasterSwitchTest 2件：4テーマの固定背景・1回のcallback・下位値保持/無効化・見出し維持・操作ノード数、幅280dp/文字200%の長文。
+
+初回の既存テスト14件中4件はAVD内のMessagesのANRダイアログによりフォーカスを失いました。該当AVD上だけでMessagesを停止するとCatalogFlowTest全5件が成功しました（47.050秒）。ライブラリ側の9件は初回から成功しています。
+
+最終Maven版の追加8件は78.953秒で成功。その後、実画像の目視でマスターの長文がStadium輪郭で切れる問題を発見し、通常72dpではPillとなる36dp固定角丸へ修正しました。修正後にMaster2件・元UI画像比較1件・階層画面1件を選んで再実行し、すべて成功しました（83.427秒）。同じ条件の修正前/後画像を回収し、切れの解消を目視確認しました。TextLayoutResultのoverflowテストだけでは輪郭によるクリップを検出できないため、画像確認も維持します。
+
+マスター背景の比較はリップル終了後に行います。Compose時計と独立したAndroidリップルが終了したことを条件に待ち、状態による背景変更と区別しています。
+
+### 元UIとの画像比較
+
+元ComposableをandroidTest専用に抽出し、360dp・fontScale 1・同じテーマ/色/データ/仮アイコン/代替フォントで撮影しています。元アプリのAPK全体の比較ではありません。
+
+| 比較 | 明暗の結果 |
+| --- | --- |
+| Scheduler M3E About / Switch / 空説明Switch | 全6条件でPNGのSHA-256まで一致 |
+| Glyph Nothing Switch / 空説明Switch / 連結遷移行 | 全6条件でPNGのSHA-256まで一致 |
+| Glyph Nothing About | 両条件とも540×537pxのうち35px（約0.012%）に差。ブリッジ切欠きの丸め・AA差を目視確認 |
+
+14条件、元/移植/差分の42画像です。自動差分はRGB各成分3以下を許容し、差分率0.1%未満を要求します。上記12条件については許容差に頼らずPNG全体のハッシュ一致も確認しました。
+
+NothingのNType/Ndotは同梱せず、両側同じSansSerif/Monospaceで比較しています。元フォント・各アプリのアイコンとの完全一致は未再現です。ShutUpのM3E名27spに対し、共通M3EはSchedulerの30spです。Glyphの固定高はSchedulerの可変高・狭幅フォールバックへ統合しています。
+
+Google「自動修正」の提供画像との寸法・色・文字拡大時の差分は[hierarchical-settings.md](hierarchical-settings.md)に記載しました。端末のDynamic Color不明のため同画像との画素一致は主張しません。
+
+### 証跡・残る確認
+
+- build/faithful-accessibility-maven.txt：最終AAR発行・独立consumer・Mavenカタログ。
+- build/faithful-accessibility-checks.txt：最終テストAPK・Lint。
+- build/faithful-jitpack-local.txt：JitPack座標・POM-only clean consumer。
+- build/faithful-existing-ui.txt：既存9件成功とANRによる4件失敗の元ログ。
+- build/faithful-catalog-retry.txt：カタログ5件成功。
+- build/faithful-final-ui.txt：追加8件成功。
+- build/faithful-accessibility-ui.txt：修正後4件成功、最終14条件の画像差分。
+- build/verification/faithful-ui/PyriteVerification/：最終比較画像・マスター8状態・文字拡大。
+- build/verification/faithful-ui/master-large-before-fix.png：輪郭クリップの修正前。
+- pyrite/build/reports/tests/testDebugUnitTest/、各module/build/reports/lint-results-*：単体/Lint。
+
+TalkBack実操作、API 26やメーカー実機、プロセス終了後の復元、元3アプリの移行ビルド、最終変更のリモートJitPack公開取得は未実施です。ShutUp/Glyphの作業ツリーはclean、Schedulerは調査開始時の3ファイルの変更を保持しています。今回の検証AVDは終了しました。
+
+## 以下は以前の実装時点の記録
+
+
 検証日：2026-10-18（JST）。Phase 1とPhase 2の結果です。
 
 ## 採用構成

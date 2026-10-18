@@ -30,7 +30,7 @@ class PyriteComponentsTest {
     @get:Rule val compose = createComposeRule()
 
     @Test fun switchesHaveOneTargetAndDisabledStateInEveryStyle() {
-        var style by mutableStateOf(PyriteStyle.Material3)
+        var style by mutableStateOf(PyriteStyle.Material3Expressive)
         var checked by mutableStateOf(false)
         var events = 0
         compose.setContent {
@@ -63,7 +63,7 @@ class PyriteComponentsTest {
     }
 
     @Test fun callerStateSurvivesStyleAndExplicitDarkModeChanges() {
-        var style by mutableStateOf(PyriteStyle.Material3)
+        var style by mutableStateOf(PyriteStyle.Material3Expressive)
         var dark by mutableStateOf(false)
         var checked by mutableStateOf(false)
         var observed = Color.Unspecified
@@ -132,7 +132,7 @@ class PyriteComponentsTest {
     }
 
     @Test fun aboutSupportsNarrowWidthLargeTextAndAllThemePairs() {
-        var style by mutableStateOf(PyriteStyle.Material3)
+        var style by mutableStateOf(PyriteStyle.Material3Expressive)
         var dark by mutableStateOf(false)
         val name = "A long application name that needs wrapping"
         compose.setContent {
@@ -141,8 +141,8 @@ class PyriteComponentsTest {
                 PyriteTheme(style, darkTheme = dark, dynamicColor = false) {
                     Box(Modifier.width(280.dp)) {
                         AboutScreen(
-                            info = AboutInfo(name, "2026.10.18-beta01",
-                                details = listOf(AboutDetail("build", "Build", "123456789"))),
+                            info = AboutInfo(name, "2026.10.18-beta01"),
+                            overview = AboutOverviewContent(build = AboutDetail("Build", "123456789")),
                             title = "About", links = emptyList(), onLinkClick = {},
                             modifier = Modifier.testTag("about")
                         )

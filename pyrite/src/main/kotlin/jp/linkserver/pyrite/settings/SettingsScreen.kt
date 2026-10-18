@@ -10,29 +10,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import jp.linkserver.pyrite.screen.PyriteScreenScaffold
 
 /**
  * Scrollable, width-constrained settings page. The host supplies navigation and owns state.
  * Content receives a ColumnScope; use SettingsGroup for keyed groups of related items.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     title: String,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    maxContentWidth: Dp = 840.dp,
+    maxContentWidth: Dp = 960.dp,
     scrollState: ScrollState = rememberScrollState(),
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = { Text(title) }, navigationIcon = navigationIcon, actions = actions
-            )
-        }
+    PyriteScreenScaffold(
+        title = title, modifier = modifier, navigationIcon = navigationIcon, actions = actions
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
             Column(
