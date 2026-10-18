@@ -1,112 +1,85 @@
 # 検証結果
 
-検証日：2026-10-18（JST）。
+検証日：2026-10-18（JST）。Phase 1とPhase 2の結果です。
 
 ## 採用構成
 
 Material 3 1.5.0-beta01 / Compose 1.12.0 / AGP 9.4.1 / Gradle 9.6.0 / JDK 21。ライブラリminSdk 26、compileSdk 37、Javaバイトコード11。
 
-Google Mavenのbeta01 AAR/POM/sourcesで公式APIと要件を照合し、この版でコンパイルしています。既存アプリの依存をダウングレードする対応は行っていません。
+beta01のGoogle Maven AAR/POM/sourcesで公式API・要件を照合し、この版でコンパイルしています。SDKの正式なpackage IDはplatforms;android-37.0です。JDK 21を事前に用意し、JDK自動取得用のFoojayプラグインは使用しません。
 
 ## ビルド・配布
 
 | 検証 | 結果 |
 | --- | --- |
-| `:pyrite:assembleRelease` | 成功 |
-| `:app:assembleDebug` | 成功 |
-| `:app:assembleRelease`（R8最適化、未署名） | 成功 |
-| `:pyrite:publishReleasePublicationToPyriteLocalRepository` | 成功 |
-| 独立した`verification/consumer`の`:app:assembleDebug` | 成功 |
-| `'-Ppyrite.usePublishedArtifact=true'`でカタログをビルド | 成功 |
-| `scripts/verify-published.ps1`全体 | 成功 |
+| :pyrite:assembleRelease | 成功 |
+| :app:assembleDebug | 成功 |
+| :app:assembleRelease（R8、未署名） | 成功（Phase 1） |
+| PyriteLocalへのrelease publication | 成功 |
+| 通常の独立Maven consumer | 成功 |
+| Maven版カタログのビルド | 成功 |
+| scripts/verify-published.ps1 | JitPack修正後も全段階成功 |
+| JitPack用座標のローカル発行＋POM consumer | 成功 |
+| JitPack LinuxビルダーでのAAR発行 | 成功、2分10秒 |
+| JitPackから匿名取得するPOM consumer | 成功、clean後38タスク、2分21秒 |
 
-独立consumerはPyriteプロジェクトへの依存・included buildを持たず、`jp.linkserver:pyrite:0.1.0-SNAPSHOT`のみを参照しています。カタログのMavenモードでも`:pyrite`へのproject依存を使用しません。
+公開成功revision：**4244bed7b36aa084c89d14338f176dbf87c0f263**。
 
-ローカルMaven出力は`build/repository`です。AAR、POM、Gradle Module Metadata、sources JAR、チェックサムを確認しました。発行AARとassembleRelease出力のハッシュ一致、classes.jar内のMIT本文・NOTICE、class major version 55を確認しています。
+```kotlin
+implementation("com.github.Link2011-Act2:Pyrite:4244bed7b36aa084c89d14338f176dbf87c0f263")
+```
 
-## 自動テスト
+JitPack APIはstatus=ok、private=false、JDK=21です。[実ビルドログ](https://jitpack.io/com/github/Link2011-Act2/Pyrite/4244bed7b36aa084c89d14338f176dbf87c0f263/build.log)。タグ・GitHub Release・GitHub Actions・Maven Central公開は作成していません。
 
-- JVM：1件成功、失敗0（設定グループの重複キーを拒否）。
-- Android UI：7件成功、失敗0、エラー0。Android 15 / API 35のPixel_6a AVDを使用。
-- 既存の接続実機は使用していません。
+## 公開物とconsumer
 
-Android UIテストの範囲：
+AAR、POM、sources JAR、Gradle Module Metadataを認証なしでダウンロードしました。
 
-1. 3スタイルでSwitchの操作属性、1回だけのcallback、無効状態を確認。
-2. スタイルと明示的なライト／ダーク変更で呼び出し側の状態が保持されることを確認。
-3. 選択ダイアログのdraft、取消、確定を確認。
-4. 設定行を追加した際にkeyに対応するremember状態が維持されることを確認。
-5. 幅280dp・文字サイズ200%でAboutの折り返しとスクロールを確認。
-6. 設定→About→コンポーネント、戻る操作、Activity再生成後の状態復元を確認。
-7. 実際のカタログのテーマ選択から3スタイル×ライト／ダークを操作し、設定状態と表示を確認。
+- POMのcompile依存：Compose UI / Foundation 1.12.0、Material 3 1.5.0-beta01、Kotlin stdlib 2.2.10。
+- POMのruntime依存：Compose Animation 1.12.0。consumerでstdlibは2.2.20へ解決。
+- 公開AAR：minCompileSdk 37、class major 55（Java 11）、classes.jarにMIT本文・NOTICEを保持。
+- sources JAR：6つのKotlinソースを確認。制限付きフォントは同梱していません。
+- 公開AARの16 classファイルはローカルrelease AARと個別ハッシュが一致。
+- 公開AARのSHA-256：`0FC0C191605DE872B8CC1D54B257130E5F2AAF876C61F7AE59175C9400CAE1AA`。
 
-全7件のHTMLレポートは`build/verification/project-tests/report/index.html`に保存しています。テストコードは`app/src/androidTest`、JVMテストは`pyrite/src/test`です。
+ローカルの通常座標は`jp.linkserver:pyrite:0.1.0-SNAPSHOT`を維持します。プロジェクト内のbuild/repositoryと専用のbuild/verification/jitpack-m2を使用し、ユーザー共通の~/.m2には発行していません。
 
-## Lint
+consumerは最小ソースとwrapperだけを別ディレクトリへコピーし、Pyriteのソース・project依存・included buildを持ちません。JitPackのPOMのみによる推移依存を使い、Gradle Module Metadataへのリダイレクトも無効にして確認しました。cleanと--no-build-cacheで出力を再生成しています。Gradleの共有ダウンロードキャッシュは使用しており、consumer側の完全なコールドダウンロードは未検証です。
 
-- ライブラリ：エラー0、警告0。
-- カタログ：エラー0、警告9。8件のGradleDependencyと1件のNewerVersionAvailableで、依存更新通知のみです。
-- 依存を採用基準に固定しているため、更新通知を理由に自動アップグレードしていません。警告の隠蔽・ベースライン化は行っていません。
+主なローカル証跡：
 
-## 検証中に修正した点
+- `build/verification/jitpack-consumer-remote.txt`：公開POM consumerの依存ツリーと成功ログ。
+- `build/verification/jitpack-consumer-remote/app/build/outputs/apk/debug/app-debug.apk`：公開AARから生成したAPK。
+- `build/verification/jitpack-public/`：匿名取得したAAR・POM・sources・moduleとAPI応答。
+- `build/verification/jitpack-4244bed-live.log`：成功したJitPackビルドログ。
 
-- beta01のTypographyに合わせ、fontFamily引数を使用。
-- 公式のSliderStateを使うSlider APIへ更新。
-- 公開ComposableのModifier引数位置を修正。
-- 翻訳の書式指定、数量文字列、無効Switch、不要な初期テンプレート資源を整理。
-- PowerShellではドットを含むGradleプロパティ引数全体を引用。READMEと検証スクリプトの両方で修正。
-- 独立consumerのGradle既定512 MiBではメモリが不足したため、同プロジェクトにも2 GiBを明示。
-- ホストのメモリ圧迫を避け、ビルドとエミュレーター実行を分離。今回の待機中Gradleデーモンだけを確認して終了。
+## UI・JVM・Lint（Phase 1）
 
-## 残された範囲
+- JVMテスト1件成功、失敗0：設定グループの重複キー拒否。
+- Android UIテスト7件成功、失敗0・エラー0：API 35のPixel_6a AVD。
+- Maven発行版カタログで追加UIテスト2件成功、失敗0（78.667秒）。
+- ライブラリLint：エラー0・警告0。カタログ：エラー0・警告9、すべて依存更新通知。
 
-- API 26端末、各メーカーの実機、TalkBack実機操作、性能・バッテリーの定量測定は未検証。
-- JitPack用設定は追加済み。リモートからの取得・Linuxビルダーでの実ビルドは未検証。詳細はdocs/distribution.mdを参照。
-- 数値・時刻編集、独立した遷移＋Switch、OSS一覧、状態モーフなどはREADMEの段階追加計画に残しています。
-- 既存3アプリへの依存導入・移行ビルドは未実施です。
+UI検証は、3スタイルでのSwitchのrole・checked・無効化・1回のcallback、テーマ切替時の状態保持、ダイアログ取消／確定、安定key、幅280dp・文字200%のAbout、画面遷移とActivity再生成、実際のカタログでの3スタイル×ライト／ダークを含みます。
 
-## 既存リポジトリの保持確認
+全7件のHTMLレポートは`build/verification/project-tests/report/index.html`、Maven版UIログは`build/verification/maven-ui-tests.txt`、18枚の画像は`build/verification/maven-screenshots/`にあります。画像のテスト後回収も確認済みです。接続実機は使用せず、今回起動したテスト用エミュレーターは終了しました。
 
-Glyph Barty：HEAD 53e568c、変更なし。ShutUp：HEAD 34241e9、変更なし。
+予約再検証では製品Composable・公開API・依存版を変更していないため、成功済みUI/JVM全件テストを繰り返していません。公開AARとローカルAARのclass一致も確認しています。公開consumerのAPKはビルド確認までで、今回あらためて端末へインストールしていません。
 
-NITTC Scheduler：HEAD 26913ba。調査開始時から存在する以下の3変更を保持しています。
+## 発見・修正した問題
 
-- ui/QrShareSelectionScreen.kt
-- ui/SettingsScreen.kt
-- ui/components/AppSettingsComponents.kt
+- beta01のTypographyのfontFamily引数、公式SliderState、Modifier引数位置、翻訳書式・数量文字列、無効Switch等をPhase 1で修正。
+- PowerShellのドットを含むGradleプロパティを引用し、consumerのGradleヒープを2 GiBへ設定。ビルドとエミュレーター実行を分離。
+- consumerの失敗時も標準エラーをログへ保存するよう修正。
+- GitHubをPublicへ変更後、JitPackの非公開判定キャッシュ更新により401が解消。
+- 04d2c84の実ビルドでFoojay resolver conventionの解決失敗を確認。JDK 21を明示済みのため、この不要な補助プラグインを削除。
+- SDK package IDのplatforms;android-37をplatforms;android-37.0へ修正。パッケージマネージャーが警告だけで成功扱いにする場合も、android.jarとBuild Toolsの確認で早期停止するよう修正。
+- aa277c6ではCompose Compiler pluginの解決失敗を確認。公開POMの存在を照合し、同じ版・設定で4244bedが成功したため、一時的な取得失敗と判断。--info/--stacktraceをJitPackログへ追加。バージョンの変更は行っていません。
 
-Pyriteの既存未追跡`.idea/.name`も保持しました。
+## 保持・未検証の範囲
 
-## 開発再開時の最終確認
+既存3アプリは変更していません。Glyph Bartyは53e568c、ShutUpは34241e9で変更なし。Schedulerは26913baで、開始時からのQrShareSelectionScreen.kt・SettingsScreen.kt・AppSettingsComponents.ktの3変更を保持しています。Pyriteの既存.idea/.nameと、先行調査で作成した未追跡docs/shutup-migration-plan.mdも保持し、この予約では計画書を編集・ステージしていません。
 
-Maven発行版のカタログで追加のAndroid UIテスト2件が成功しました（78.667秒、失敗0）。3スタイル×ライト／ダークのテーマ操作・状態保持、幅280dp・文字サイズ200%のAboutを確認しています。ログはbuild/verification/maven-ui-tests.txt、18枚の画像はbuild/verification/maven-screenshotsに保存しました。画像をMediaStoreへ保存し、テスト後にも回収できることを確認しています。テスト用エミュレーターは終了しました。
+API 26端末、各メーカー実機、TalkBack実機操作、定量的な性能・バッテリー測定、consumerの完全な空キャッシュでのダウンロードは未検証です。既存アプリへの依存導入・移行ビルドも未実施です。数値・時刻編集などの追加部品は今後の計画のままです。
 
-## JitPack対応のローカル検証
-
-- `jitpack.yml`、SDK準備スクリプト、JitPack環境変数による公開座標の切り替えを追加。
-- `scripts/verify-jitpack.ps1`のローカルモード：成功（consumerはclean後に38タスク、2分）。
-- `com.github.Link2011-Act2:Pyrite:0.1.0-localcheck`を専用mavenLocalへ発行し、POMのみで独立consumerのAPKをビルド。
-- Pyriteのソースを含まないコピー先で、UI / Foundation / Animation 1.12.0、Material 3 1.5.0-beta01が推移依存から解決されることを確認。
-- AAR、sources JAR、POM、Gradle Module Metadataを確認。発行AARのSHA-256は通常のrelease AARと一致：`D7D6395E59CB7312FB260F9338E3C6137CB3C98A522C10C73F9D6C693B44370D`。
-- シェル構文チェック成功、Gradle wrapperはindex・作業ファイルともLF。実行権限に依存せず`sh gradlew`で呼び出す設定。
-- 切り替え後も通常の`scripts/verify-published.ps1`が全段階成功。通常座標`jp.linkserver:pyrite:0.1.0-SNAPSHOT`を維持。
-
-JitPack実サーバーでのビルドとリモート取得は未検証です。ユーザーの承認により、設定commit 04d2c849d9bc962c6686b197fa574f8541ae1e52をmasterへFast-forwardし、通常Pushしました。リモートmasterのcommit一致を確認しています。同commitで独立consumerのリモートモードを実行しましたが、JitPackのPOM取得がHTTP 401 Unauthorizedで失敗しました。JitPack APIも「Repo not found or no token provided」を返し、認証なしGitHub APIは引き続き404でした。Gradleのconfiguration cache保存エラーはこの依存解決失敗に伴うものです。依存バージョンは変更していません。GitHubの公開設定を確認後、再検証が必要です。タグ・GitHub Releaseは作成していません。
-
-既存の成功済みJVM・UI全件テストは再実行していません。今回は配布設定と検証手順のみを変更し、製品のCompose実装・公開API・依存バージョンは変更していません。Phase 3・4の新たな調査には未着手です。
-
-配布方針はユーザー確認により「ソースとAARを公開する」に確定しました。GitHubの公開設定は未変更です。既存3アプリのGit状態も調査開始時と一致していることを再確認しました。
-
-### Public変更後の確認（2026-10-18 15:36 JST）
-
-ユーザーによるPublic変更後、認証なしのGitHub APIでprivate: false・visibility: publicとcommit 04d2c849d9bc962c6686b197fa574f8541ae1e52の取得を確認しました。JitPack APIとPOMは引き続きHTTP 401を返しています。公式FAQの非公開判定1時間キャッシュの影響が考えられるため、更新後に再試行します。GitHub側の追加設定を求める段階ではありません。
-
-https://docs.jitpack.io/faq/ の「Change my repository to public but still got the message No access token」を参照。Phase 3・4は引き続き未着手です。
-
-### 16:45の予約再検証
-
-公開アクセスの401は解消し、04d2c84のJitPack実ビルドが開始されました。実ログはbuild/verification/jitpack-04d2c84-build.logに保存しました。失敗原因はsettings.gradle.ktsのFoojay resolver convention 1.0.0の解決失敗です。またSDK準備ではplatforms;android-37が存在せず、警告を出したままコマンドが成功扱いとなっていました。
-
-JitPackにJDK 21を明示済みであり、自動JDK取得は不要なためFoojay設定を削除しました。SDK package IDは検証済みローカル環境のpackage.xmlにあるplatforms;android-37.0へ修正し、android.jarとBuild Toolsの存在確認を追加しました。compileSdk 37、M3 beta01、Compose 1.12.0、AGP/Gradleの版は変更していません。更新commitの実ビルド・取得結果を以下へ追記します。
-
-既存の未追跡docs/shutup-migration-plan.mdは保持し、予約検証では編集・ステージしていません。先行して完了したPhase 3の調査をやり直したり、移行実装へ進めたりはしていません。
+Phase 3は別途許可された調査と計画提示まで完了しており、承認待ちです。今回の予約で移行実装やPhase 4の調査へ進んでいません。追加の自動実行は設定していません。

@@ -28,14 +28,14 @@ JDK 21とSDKを設定したWindows開発環境で：
 .\scripts/verify-jitpack.ps1
 
 # 公開・反映済みのcommit SHA、または承認済み0.x.xタグを使った実際の取得
-.\scripts/verify-jitpack.ps1 -Revision '<公開済みrevision>'
+.\scripts/verify-jitpack.ps1 -Revision '4244bed7b36aa084c89d14338f176dbf87c0f263'
 ```
 
 省略時は`build/verification/jitpack-m2`を隔離したmavenLocalとして使用します。ユーザー共通の`~/.m2`には発行しません。`0.1.0-localcheck`はローカル検証専用で、JitPack上の公開版ではありません。
 
 両モードともconsumerの最小ソースとwrapperだけを`build/verification/jitpack-consumer-local`または`-remote`へコピーし、clean後にビルドします。Pyriteのソース・project依存・included buildはありません。PyriteのGradle Module Metadataを使用せず、POMのcompile/runtime推移依存だけで利用できることを確認します。依存解決結果は`build/verification/jitpack-consumer-<mode>.txt`に記録します。
 
-Gradleの共有ダウンロードキャッシュは使用します。完全なキャッシュ未保有のLinux環境とJitPack実サーバーでの成功は、リモート検証の完了後に記録します。ローカル検証をJitPack上での成功として扱わないでください。
+JitPackのLinuxビルダーでSDK・wrapperの取得からAAR発行まで成功し、Windowsの独立consumerでも公開POMからのビルドが成功しました。consumerはcleanと--no-build-cacheを使用しますが、共有ダウンロードキャッシュは利用します。consumer側の完全に空の依存キャッシュや全OSでの実行は未検証です。
 
 通常のローカル開発には引き続き`scripts/verify-published.ps1`を使用します。
 
@@ -59,8 +59,8 @@ dependencyResolutionManagement {
 `app/build.gradle.kts`：
 
 ```kotlin
-// 公開済みの固定revisionに置き換えてください。
-implementation("com.github.Link2011-Act2:Pyrite:<revision>")
+// 2026-10-18に実取得・consumerビルドを確認した固定commit。
+implementation("com.github.Link2011-Act2:Pyrite:4244bed7b36aa084c89d14338f176dbf87c0f263")
 ```
 
 Composeの有効化、対応するCompose Compiler plugin、SDK要件はREADMEを参照してください。UI / Foundation / Material 3 / AnimationはPOMで配布します。利用側でPyriteのソースをCloneする必要はありません。可変の`master-SNAPSHOT`は再現性を求める利用には推奨しません。
@@ -78,4 +78,13 @@ Composeの有効化、対応するCompose Compiler plugin、SDK要件はREADME�
 - [commit SHAでの利用](https://docs.jitpack.io/)
 - [公開範囲・認証に関するFAQ](https://docs.jitpack.io/faq/)
 
-masterへの反映はcommit `04d2c84`で完了しました。Public変更後もJitPack APIと同commitのPOM取得はHTTP 401で「Repo not found or no token provided」を返しました。公式FAQでは非公開判定を1時間キャッシュすると説明されています。現在はこのキャッシュ更新待ちと考えられます。GitHub側の公開設定は確認済みで、JitPackへの認証情報追加や依存バージョン変更は行いません。キャッシュ更新後に同じ固定commitで取得・consumerビルドを再試行します。
+
+## 実取得の結果
+
+検証済みrevision：`4244bed7b36aa084c89d14338f176dbf87c0f263`。JitPack APIのstatusはok、privateはfalseです。認証情報を与えずにAAR・POM・sources JAR・Gradle Module Metadataを取得し、POMのみの推移依存で独立consumerをビルドしました。
+
+JitPackのビルドは2分10秒、consumerのcleanビルドは2分21秒で成功しました。公開物のSDKメタデータ、Java 11形式、MIT・NOTICE、6つのKotlinソースを確認しています。公開AAR中の16 classファイルはローカルAARと同じハッシュでした。アーカイブ全体のバイト一致を保証するものではありません。
+
+初回の401は公開設定・非公開判定キャッシュ更新後に解消しました。実ビルドでは不要なFoojayプラグインを削除し、SDK package IDをplatforms;android-37.0へ修正しました。続くComposeプラグイン解決失敗は同じ版の再試行で成功したため、一時的な取得失敗と判断しています。M3・Compose・SDK・AGP・Gradleの基準版は変更していません。
+
+[成功したJitPackビルドログ](https://jitpack.io/com/github/Link2011-Act2/Pyrite/4244bed7b36aa084c89d14338f176dbf87c0f263/build.log)。ローカル証跡の場所はdocs/verification.mdを参照してください。

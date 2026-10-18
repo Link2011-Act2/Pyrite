@@ -84,17 +84,34 @@ AARファイルだけをコピーする方法では推移依存情報が失わ�
 
 標準の`:pyrite:publishToMavenLocal`も利用できます。上記の検証はユーザー共通の`~/.m2`を変更せず、プロジェクト内のMavenリポジトリを使います。JitPack向けの配布設定は下記を参照してください。
 
-## JitPackによる利用（配布準備）
+## JitPackによる利用
 
-`jitpack.yml`でJDK 21・SDK 37と既存のMaven Publishを使用する構成を用意しています。想定座標は`com.github.Link2011-Act2:Pyrite:<revision>`です。公開対象はライブラリAAR一つです。
+`jitpack.yml`でJDK 21・SDK 37と既存のMaven Publishを使用する構成を用意しています。公開座標の形式は`com.github.Link2011-Act2:Pyrite:<revision>`です。公開対象はライブラリAAR一つです。
 
-**JitPack実サーバーからの取得成功は再検証中です。** Publicへの変更と非公開判定キャッシュ更新後、実ビルドまで進みました。JDK補助プラグインの解決失敗とSDK package IDを修正しています。JDK 21を事前に用意する方針と、M3・Compose・compileSdkの基準版は維持します。タグ・GitHub Releaseは作成していません。
+**JitPackの実ビルドと独立consumerの取得・ビルドに成功しました（2026-10-18）。** 検証済みの固定commitは`4244bed7b36aa084c89d14338f176dbf87c0f263`です。タグ・GitHub Releaseは作成していません。
+
+利用側の`settings.gradle.kts`の`repositories`へ追加：
+
+```kotlin
+maven {
+    url = uri("https://jitpack.io")
+    content { includeGroup("com.github.Link2011-Act2") }
+}
+```
+
+`app/build.gradle.kts`：
+
+```kotlin
+implementation("com.github.Link2011-Act2:Pyrite:4244bed7b36aa084c89d14338f176dbf87c0f263")
+```
+
+利用アプリ側でPyriteのソースを取得する必要はありません。SDK・Compose Compilerの要件は上記を参照してください。
 
 ```powershell
 # 専用ローカルMavenでJitPack座標とPOMの推移依存を検証
 .\scripts/verify-jitpack.ps1
 # 公開反映後、固定commit SHAまたは承認済み0.x.xタグで取得・ビルド
-.\scripts/verify-jitpack.ps1 -Revision '<公開済みrevision>'
+.\scripts/verify-jitpack.ps1 -Revision '4244bed7b36aa084c89d14338f176dbf87c0f263'
 ```
 
 利用側のリポジトリ設定、公開前の条件、クリーンビルドの手順は[配布ドキュメント](docs/distribution.md)を参照してください。[検証結果](docs/verification.md)に実施済み・未検証の範囲を記載しています。
