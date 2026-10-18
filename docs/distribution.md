@@ -13,7 +13,9 @@ JitPack時は公式の環境変数`JITPACK`、`GROUP`、`ARTIFACT`、`VERSION`�
 
 ## ビルダー
 
-`jitpack.yml`はJDK 21を選択し、`scripts/jitpack-prepare.sh`でSDK Platform 37とBuild Tools 36.0.0（既存ビルドの既定版）を用意します。使い捨てビルダー内でSDKライセンスを受諾します。SDKはJitPackの`ANDROID_HOME`を使用し、開発者の`local.properties`に依存しません。
+`jitpack.yml`はJDK 21を選択し、`scripts/jitpack-prepare.sh`でSDK Platform 37.0（API 37）とBuild Tools 36.0.0（既存ビルドの既定版）を用意します。使い捨てビルダー内でSDKライセンスを受諾します。SDKはJitPackの`ANDROID_HOME`を使用し、開発者の`local.properties`に依存しません。
+
+JDK自動取得用Foojayプラグインは使用せず、JitPackのJDK 21（ローカルでは事前にインストールしたJDK 21）で実行します。SDK準備後はandroid.jarとBuild Toolsの存在を確認し、未取得ならビルド前に停止します。
 
 固定済みのGradle wrapperで`:pyrite:publishReleasePublicationToMavenLocal`を実行します。`sh gradlew`とLF改行を使うため、Windowsで作成された実行権限に依存しません。GitHub Actions、Maven Central、追加プラグインは使用しません。
 

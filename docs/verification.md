@@ -102,3 +102,11 @@ JitPack実サーバーでのビルドとリモート取得は未検証です。�
 ユーザーによるPublic変更後、認証なしのGitHub APIでprivate: false・visibility: publicとcommit 04d2c849d9bc962c6686b197fa574f8541ae1e52の取得を確認しました。JitPack APIとPOMは引き続きHTTP 401を返しています。公式FAQの非公開判定1時間キャッシュの影響が考えられるため、更新後に再試行します。GitHub側の追加設定を求める段階ではありません。
 
 https://docs.jitpack.io/faq/ の「Change my repository to public but still got the message No access token」を参照。Phase 3・4は引き続き未着手です。
+
+### 16:45の予約再検証
+
+公開アクセスの401は解消し、04d2c84のJitPack実ビルドが開始されました。実ログはbuild/verification/jitpack-04d2c84-build.logに保存しました。失敗原因はsettings.gradle.ktsのFoojay resolver convention 1.0.0の解決失敗です。またSDK準備ではplatforms;android-37が存在せず、警告を出したままコマンドが成功扱いとなっていました。
+
+JitPackにJDK 21を明示済みであり、自動JDK取得は不要なためFoojay設定を削除しました。SDK package IDは検証済みローカル環境のpackage.xmlにあるplatforms;android-37.0へ修正し、android.jarとBuild Toolsの存在確認を追加しました。compileSdk 37、M3 beta01、Compose 1.12.0、AGP/Gradleの版は変更していません。更新commitの実ビルド・取得結果を以下へ追記します。
+
+既存の未追跡docs/shutup-migration-plan.mdは保持し、予約検証では編集・ステージしていません。先行して完了したPhase 3の調査をやり直したり、移行実装へ進めたりはしていません。
