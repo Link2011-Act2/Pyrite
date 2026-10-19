@@ -222,11 +222,11 @@ fun SettingsStatusItem(title: String, status: String, modifier: Modifier = Modif
     val expressive = LocalPyriteStyle.current == PyriteStyle.Material3Expressive
     val alpha = if (enabled) 1f else .38f
     val summaryStyle = if (expressive) MaterialTheme.typography.bodyMedium.copy(
-        fontFamily = FontFamily.SansSerif, fontSize = 14.sp, lineHeight = 21.sp,
+        fontFamily = LocalPyriteFonts.current.body ?: FontFamily.SansSerif, fontSize = 14.sp, lineHeight = 21.sp,
         letterSpacing = .15.sp) else MaterialTheme.typography.bodyMedium
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(title, style = if (expressive) MaterialTheme.typography.bodyLarge.copy(
-            fontFamily = FontFamily.SansSerif, fontSize = 16.sp, lineHeight = 24.sp,
+            fontFamily = LocalPyriteFonts.current.body ?: FontFamily.SansSerif, fontSize = 16.sp, lineHeight = 24.sp,
             letterSpacing = .2.sp, fontWeight = FontWeight.Bold) else MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha))
         if (!summary.isNullOrBlank() || supporting != null) CompositionLocalProvider(

@@ -9,6 +9,7 @@ import jp.linkserver.pyrite.about.*
 import jp.linkserver.pyrite.screen.*
 import jp.linkserver.pyrite.settings.*
 import jp.linkserver.pyrite.theme.*
+import androidx.compose.ui.text.font.FontFamily
 
 /** Standalone binary consumer: no project dependency or Pyrite sources. */
 class MainActivity : ComponentActivity() {
@@ -18,7 +19,7 @@ class MainActivity : ComponentActivity() {
             var checked by rememberSaveable { mutableStateOf(false) }
             var detail by rememberSaveable { mutableStateOf(true) }
             var screen by rememberSaveable { mutableIntStateOf(0) }
-            PyriteTheme {
+            PyriteTheme(fonts = PyriteFonts(title = FontFamily.Serif, accent = FontFamily.Monospace)) {
                 PyriteScreenTransition(screen, { initial, target ->
                     if (target > initial) PyriteNavigationDirection.Forward
                     else PyriteNavigationDirection.Backward

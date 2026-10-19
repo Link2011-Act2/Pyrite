@@ -69,6 +69,8 @@ fun AboutOverviewMosaic(
                             Text(info.name,
                                 modifier = Modifier.semantics { heading() },
                                 style = if (nothing) LocalTextStyle.current else MaterialTheme.typography.headlineMedium,
+                                fontFamily = LocalPyriteFonts.current.title ?: (if (nothing) FontFamily.SansSerif
+                                    else if (LocalPyriteFonts.current.body != null) FontFamily.Default else null),
                                 fontWeight = if (nothing) FontWeight.Normal else FontWeight.Bold,
                                 fontSize = if (nothing) 27.sp else 30.sp,
                                 lineHeight = if (nothing) 32.sp else 36.sp)
@@ -155,7 +157,7 @@ fun AboutOverviewMosaic(
                                 verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Text(it.label, style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                StrongValue(it.value, nothing, dotted = nothing)
+                                StrongValue(it.value, nothing, dotted = nothing, accent = true)
                             }
                         }
                     }
@@ -165,8 +167,14 @@ fun AboutOverviewMosaic(
     }
 }
 
-@Composable private fun StrongValue(value: String, nothing: Boolean, modifier: Modifier = Modifier, dotted: Boolean = false) {
-    Text(value, modifier, fontFamily = if (dotted) FontFamily.Monospace else null,
+@Composable private fun StrongValue(value: String, nothing: Boolean, modifier: Modifier = Modifier, dotted: Boolean = false,
+    accent: Boolean = false) {
+    val fonts = LocalPyriteFonts.current
+    // M3E's source uses a nullable family (inherit). Do not let a body-only override
+    // bleed into the two identity roles through LocalTextStyle's merge.
+    val sourceFamily = (if (nothing) SourceNothingTypography.bodyLarge.fontFamily else SourceExpressiveTypography.bodyLarge.fontFamily)
+        ?: if (fonts.body != null) FontFamily.Default else null
+    Text(value, modifier, fontFamily = if (accent) fonts.accent ?: (if (dotted) FontFamily.Monospace else sourceFamily) else fonts.title ?: sourceFamily,
         fontWeight = if (nothing) FontWeight.Normal else FontWeight.Bold, fontSize = 25.sp, lineHeight = 29.sp)
 }
 

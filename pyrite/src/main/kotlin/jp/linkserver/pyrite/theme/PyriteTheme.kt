@@ -36,6 +36,16 @@ fun PyriteTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
+) = PyriteTheme(PyriteFonts(), style, darkTheme, dynamicColor, content)
+
+/** Applies optional semantic font roles; all other design rules remain owned by Pyrite. */
+@Composable
+fun PyriteTheme(
+    fonts: PyriteFonts,
+    style: PyriteStyle = PyriteStyle.Material3Expressive,
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit
 ) {
     // The official themes occupy different composition branches. Keep caller UI identity
     // when moving between them, including nested saveable state holders and focus state.
@@ -52,16 +62,17 @@ fun PyriteTheme(
     val colors = if (style == PyriteStyle.Material3Expressive && !darkTheme) {
         baseColors.copy(surface = baseColors.surfaceContainerLow, background = baseColors.surfaceContainerLow)
     } else baseColors
-    CompositionLocalProvider(LocalPyriteStyle provides style, LocalPyriteDarkTheme provides darkTheme) {
+    CompositionLocalProvider(LocalPyriteStyle provides style, LocalPyriteDarkTheme provides darkTheme,
+        LocalPyriteFonts provides fonts) {
         if (style == PyriteStyle.Material3Expressive) {
             MaterialExpressiveTheme(
-                colorScheme = colors, typography = SourceExpressiveTypography, shapes = SourceExpressiveShapes,
+                colorScheme = colors, typography = fonts.applyTo(SourceExpressiveTypography), shapes = SourceExpressiveShapes,
                 motionScheme = MotionScheme.expressive(), content = stableContent
             )
         } else {
             MaterialTheme(
                 colorScheme = colors,
-                typography = SourceNothingTypography,
+                typography = fonts.applyTo(SourceNothingTypography),
                 shapes = Shapes(),
                 motionScheme = MotionScheme.standard(),
                 content = stableContent

@@ -1,5 +1,7 @@
 # 公開API（0.1 開発版）
 
+フォント指定は[PyriteFonts](fonts.md)を参照してください。既存のPyriteThemeシグネチャは維持し、任意のFontFamilyを受け取るオーバーロードを追加しています。
+
 過去のPyrite APIとの互換性は維持しません。実装・使用例・consumerは以下のAPIを使います。パッケージ別の全一覧は[README](../README.md#公開api)、操作例は[カタログ](catalog.md)を参照してください。
 
 ## 削除・統合したAPI

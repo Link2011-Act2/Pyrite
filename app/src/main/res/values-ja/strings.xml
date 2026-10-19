@@ -124,4 +124,6 @@
     <string name="undo_correction">Backspaceで自動修正を元に戻す</string>
     <string name="navigation_details_intro">Aboutから進む詳細画面です。戻る／再表示／Activity再生成後も、スクロール位置と補足情報の表示状態を保持します。</string>
     <string name="navigation_details_extra">補足ビルド情報を表示</string>
+    <string name="custom_fonts">カスタムフォント</string>
+    <string name="custom_fonts_summary">タイトルをSerif、装飾文字をMonospaceにします。本文は変更しません。</string>
 </resources>

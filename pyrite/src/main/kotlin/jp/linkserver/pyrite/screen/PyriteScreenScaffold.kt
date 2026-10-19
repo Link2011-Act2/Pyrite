@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import jp.linkserver.pyrite.R
 import jp.linkserver.pyrite.theme.LocalPyriteStyle
 import jp.linkserver.pyrite.theme.PyriteStyle
+import jp.linkserver.pyrite.theme.LocalPyriteFonts
 
 /**
  * Source-style page chrome. The host owns navigation and supplies the localized title/actions.
@@ -42,8 +43,8 @@ fun PyriteScreenScaffold(
                         modifier = if (nothing) Modifier.padding(bottom = 2.dp) else Modifier,
                         style = if (nothing) MaterialTheme.typography.titleLarge.copy(
                             platformStyle = PlatformTextStyle(includeFontPadding = false),
-                            fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Normal
-                        ) else ShutterTitleStyle)
+                            fontFamily = LocalPyriteFonts.current.title ?: FontFamily.SansSerif, fontWeight = FontWeight.Normal
+                        ) else ShutterTitleStyle.copy(fontFamily = LocalPyriteFonts.current.title ?: ShutterTitleStyle.fontFamily))
                 },
                 navigationIcon = navigationIcon,
                 actions = actions,

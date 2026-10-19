@@ -1,0 +1,98 @@
+[
+  {
+    "image": "palette-b-fonts-expressive-dark-dynamic-about.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-expressive-dark-dynamic-settings.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-expressive-dark-static-about.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 25920
+  },
+  {
+    "image": "palette-b-fonts-expressive-dark-static-settings.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-expressive-light-dynamic-about.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-expressive-light-dynamic-settings.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-expressive-light-static-about.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-expressive-light-static-settings.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-nothing-dark-dynamic-about.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-nothing-dark-dynamic-settings.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-nothing-dark-static-about.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-nothing-dark-static-settings.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-nothing-light-dynamic-about.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-nothing-light-dynamic-settings.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-nothing-light-static-about.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  },
+  {
+    "image": "palette-b-fonts-nothing-light-static-settings.png",
+    "verticalOffset": 90,
+    "overlapPixels": 856800,
+    "changed": 0
+  }
+]

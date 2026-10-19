@@ -124,4 +124,6 @@
     <string name="undo_correction">Undo auto-correction with Backspace</string>
     <string name="navigation_details_intro">A detail screen opened from About. Scroll position and additional information survive back navigation and Activity recreation.</string>
     <string name="navigation_details_extra">Show additional build information</string>
+    <string name="custom_fonts">Custom fonts</string>
+    <string name="custom_fonts_summary">Serif titles and monospace accents; body text stays unchanged.</string>
 </resources>

@@ -65,6 +65,7 @@ internal fun PyriteCatalog() {
     var style by rememberSaveable { mutableStateOf(PyriteStyle.Material3Expressive) }
     var colorMode by rememberSaveable { mutableStateOf(ColorMode.System) }
     var dynamicColor by rememberSaveable { mutableStateOf(false) }
+    var customFonts by rememberSaveable { mutableStateOf(false) }
     var largeText by rememberSaveable { mutableStateOf(false) }
     var narrow by rememberSaveable { mutableStateOf(false) }
     var notifications by rememberSaveable { mutableStateOf(true) }
@@ -111,7 +112,8 @@ internal fun PyriteCatalog() {
     CompositionLocalProvider(
         LocalDensity provides Density(density.density, density.fontScale * if (largeText) 1.5f else 1f)
     ) {
-        PyriteTheme(style = style, darkTheme = dark, dynamicColor = dynamicColor) {
+        PyriteTheme(fonts = if (customFonts) PyriteFonts(title = FontFamily.Serif, accent = FontFamily.Monospace)
+            else PyriteFonts(), style = style, darkTheme = dark, dynamicColor = dynamicColor) {
             CatalogViewport(narrow) {
                 PyriteScreenTransition(
                     targetState = page,
@@ -165,6 +167,10 @@ internal fun PyriteCatalog() {
                                         onCheckedChange = { narrow = it },
                                         summary = stringResource(R.string.narrow_summary)
                                     )
+                                }
+                                item("fonts") {
+                                    SettingsSwitchItem(stringResource(R.string.custom_fonts), customFonts,
+                                        { customFonts = it }, summary = stringResource(R.string.custom_fonts_summary))
                                 }
                                 item("large") {
                                     SettingsSwitchItem(
