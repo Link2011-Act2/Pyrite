@@ -195,7 +195,7 @@ fun SettingsStatusItem(title: String, status: String, modifier: Modifier = Modif
 ) {
     val position = LocalGroupPosition.current
     val shape = PyriteDefaults.connectedShape(position.index == 0, position.index == position.count - 1)
-    val color = MaterialTheme.colorScheme.surfaceContainerHigh
+    val color = pyriteCardColor()
     if (onClick == null) Surface(modifier.fillMaxWidth().heightIn(min = 72.dp), shape, color, content = content)
     else Surface(onClick, modifier.fillMaxWidth().heightIn(min = 72.dp), enabled = enabled,
         shape = shape, color = color, content = content)

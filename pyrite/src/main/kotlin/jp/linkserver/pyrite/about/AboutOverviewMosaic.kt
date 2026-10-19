@@ -51,7 +51,7 @@ fun AboutOverviewMosaic(
     onAttributionClick: ((AboutAttribution) -> Unit)? = null
 ) {
     val nothing = LocalPyriteStyle.current == PyriteStyle.Nothing
-    val cardColor = MaterialTheme.colorScheme.surfaceContainerHigh
+    val cardColor = pyriteCardColor()
     val gutterColor = if (nothing) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.background
     val gap = 3.dp
     val fontScale = LocalDensity.current.fontScale
@@ -171,7 +171,7 @@ fun AboutOverviewMosaic(
 }
 
 @Composable private fun SourceCard(onClick: (() -> Unit)?, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val color = MaterialTheme.colorScheme.surfaceContainerHigh
+    val color = pyriteCardColor()
     val shape = RoundedCornerShape(20.dp)
     if (onClick == null) Surface(modifier, shape, color, content = content)
     else Surface(onClick, modifier, shape = shape, color = color, content = content)

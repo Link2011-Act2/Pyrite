@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import jp.linkserver.pyrite.internal.PyriteDefaults
 import jp.linkserver.pyrite.theme.LocalPyriteStyle
 import jp.linkserver.pyrite.theme.PyriteStyle
+import jp.linkserver.pyrite.theme.pyriteCardColor
 
 /**
  * Explanation with optional supporting content, standard spacing and a semantic heading.
@@ -22,7 +23,7 @@ fun SettingsInfoCard(
     content: @Composable ColumnScope.() -> Unit = {}
 ) {
     Card(modifier.fillMaxWidth(), shape = PyriteDefaults.cardShape(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+        colors = CardDefaults.cardColors(containerColor = pyriteCardColor())) {
         Column(Modifier.padding(PyriteDefaults.cardPadding),
             verticalArrangement = Arrangement.spacedBy(PyriteDefaults.contentGap)) {
             Text(title, style = MaterialTheme.typography.titleLarge,

@@ -35,7 +35,6 @@ fun PyriteScreenScaffold(
     Scaffold(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = LocalPyriteScaffoldInsets.current ?: ScaffoldDefaults.contentWindowInsets,
         topBar = {
             TopAppBar(
                 title = {

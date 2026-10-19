@@ -1,0 +1,98 @@
+[
+  {
+    "phase": "before",
+    "theme": "expressive-light-static",
+    "settingsBackground": "#E7EFF4",
+    "aboutBackground": "#EAF2F6",
+    "card": "#C7D4DC",
+    "primary": "#0E5E76",
+    "high": "#C7D4DC",
+    "highest": "#B9C8D1",
+    "bodyContrast": 11.407285135799208,
+    "summaryContrast": 6.170475566730452
+  },
+  {
+    "phase": "before",
+    "theme": "expressive-light-dynamic",
+    "settingsBackground": "#FAF8FF",
+    "aboutBackground": "#FAF8FF",
+    "card": "#E8E7EF",
+    "primary": "#495D92",
+    "high": "#E8E7EF",
+    "highest": "#E3E2E9",
+    "bodyContrast": 13.99242036988376,
+    "summaryContrast": 7.6306263584673735
+  },
+  {
+    "phase": "before",
+    "theme": "expressive-dark-static",
+    "settingsBackground": "#0E1519",
+    "aboutBackground": "#0A1013",
+    "card": "#26313A",
+    "primary": "#8DD3EE",
+    "high": "#26313A",
+    "highest": "#2F3C46",
+    "bodyContrast": 10.25765194188175,
+    "summaryContrast": 7.824281941600312
+  },
+  {
+    "phase": "before",
+    "theme": "expressive-dark-dynamic",
+    "settingsBackground": "#121318",
+    "aboutBackground": "#121318",
+    "card": "#292A2F",
+    "primary": "#B2C5FF",
+    "high": "#292A2F",
+    "highest": "#33343A",
+    "bodyContrast": 11.129340357437835,
+    "summaryContrast": 8.429848663248908
+  },
+  {
+    "phase": "before",
+    "theme": "nothing-light-static",
+    "settingsBackground": "#EDEDED",
+    "aboutBackground": "#EDEDED",
+    "card": "#FFFFFF",
+    "primary": "#000000",
+    "high": "#FFFFFF",
+    "highest": "#FFFFFF",
+    "bodyContrast": 21,
+    "summaryContrast": 7.339630843301721
+  },
+  {
+    "phase": "before",
+    "theme": "nothing-light-dynamic",
+    "settingsBackground": "#EDEDED",
+    "aboutBackground": "#EDEDED",
+    "card": "#FFFFFF",
+    "primary": "#000000",
+    "high": "#FFFFFF",
+    "highest": "#FFFFFF",
+    "bodyContrast": 21,
+    "summaryContrast": 7.339630843301721
+  },
+  {
+    "phase": "before",
+    "theme": "nothing-dark-static",
+    "settingsBackground": "#000000",
+    "aboutBackground": "#000000",
+    "card": "#121212",
+    "primary": "#FFFFFF",
+    "high": "#121212",
+    "highest": "#181818",
+    "bodyContrast": 18.733663748203206,
+    "summaryContrast": 12.145786284882863
+  },
+  {
+    "phase": "before",
+    "theme": "nothing-dark-dynamic",
+    "settingsBackground": "#000000",
+    "aboutBackground": "#000000",
+    "card": "#121212",
+    "primary": "#FFFFFF",
+    "high": "#121212",
+    "highest": "#181818",
+    "bodyContrast": 18.733663748203206,
+    "summaryContrast": 12.145786284882863
+  }
+]

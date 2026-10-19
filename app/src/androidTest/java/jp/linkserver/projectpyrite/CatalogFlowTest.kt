@@ -128,34 +128,47 @@ class CatalogFlowTest {
     }
 
     @Test fun aboutDetailsRetainScrollAndLocalStateAcrossBackAndRecreation() {
-        android.util.Log.i("PyriteNavigationTest", "details: opening About")
+        verifyAboutDetailsRestoration("expressive")
+    }
+
+    @Test fun nothingAboutDetailsRetainScrollAndLocalStateAcrossBackAndRecreation() {
+        choose(R.string.design_style, text(R.string.nothing_style))
+        verifyAboutDetailsRestoration("nothing")
+    }
+
+    private fun verifyAboutDetailsRestoration(style: String) {
         compose.onNodeWithText(text(R.string.about)).performScrollTo().performClick()
-        android.util.Log.i("PyriteNavigationTest", "details: setting About scroll")
         scrollBy(200f)
         compose.onNode(hasText(text(R.string.integration)) and hasClickAction()).assertIsDisplayed()
         val aboutScroll = scrollPosition()
-        android.util.Log.i("PyriteNavigationTest", "details: opening details")
         compose.onNode(hasText(text(R.string.integration)) and hasClickAction()).performClick()
         compose.onNodeWithText(text(R.string.navigation_details_extra)).performClick().assertIsOn()
         scrollBy(10000f)
         compose.onNodeWithText("Build JDK").assertIsDisplayed()
         val detailScroll = scrollPosition()
+        val detailMaximum = scrollMaximum()
+        val rootBounds = compose.onRoot().fetchSemanticsNode().boundsInRoot
+        val viewportBounds = compose.onNode(hasScrollAction()).fetchSemanticsNode().boundsInRoot
+        val window = windowGeometry()
         logScrollGeometry("before recreation")
-        capture("navigation-details-before-recreation")
-        android.util.Log.i("PyriteNavigationTest", "details: recreating")
+        capture("navigation-" + style + "-details-before-recreation")
         org.junit.Assert.assertTrue(detailScroll > 0f)
-        compose.activityRule.scenario.recreate()
-        logScrollGeometry("after recreation")
-        capture("navigation-details-after-recreation")
-        compose.onNodeWithText(text(R.string.navigation_details_extra)).assertIsOn()
-        org.junit.Assert.assertEquals(
-            minOf(detailScroll, scrollMaximum()), scrollPosition(), 1f)
-        val retainedDetailScroll = scrollPosition()
+        repeat(2) { recreation ->
+            compose.activityRule.scenario.recreate()
+            logScrollGeometry("after recreation " + (recreation + 1))
+            compose.onNodeWithText(text(R.string.navigation_details_extra)).assertIsOn()
+            org.junit.Assert.assertEquals("Restored offset", detailScroll, scrollPosition(), 1f)
+            org.junit.Assert.assertEquals("Scroll range", detailMaximum, scrollMaximum(), 1f)
+            org.junit.Assert.assertEquals("Compose root", rootBounds, compose.onRoot().fetchSemanticsNode().boundsInRoot)
+            org.junit.Assert.assertEquals("Scroll viewport", viewportBounds,
+                compose.onNode(hasScrollAction()).fetchSemanticsNode().boundsInRoot)
+            org.junit.Assert.assertEquals("Android content and system bars", window, windowGeometry())
+        }
+        capture("navigation-" + style + "-details-after-recreation")
         compose.onNodeWithContentDescription(text(R.string.back)).performClick()
         org.junit.Assert.assertEquals(aboutScroll, scrollPosition(), 1f)
-        android.util.Log.i("PyriteNavigationTest", "details: reopening details")
         compose.onNode(hasText(text(R.string.integration)) and hasClickAction()).assertIsDisplayed().performClick()
-        org.junit.Assert.assertEquals(minOf(retainedDetailScroll, scrollMaximum()), scrollPosition(), 1f)
+        org.junit.Assert.assertEquals(detailScroll, scrollPosition(), 1f)
         scrollBy(-10000f)
         compose.onNodeWithText(text(R.string.navigation_details_extra)).assertIsOn()
         pressBack()
@@ -197,6 +210,18 @@ class CatalogFlowTest {
             ", max=" + scrollMaximum() + ", bounds=" + node.boundsInRoot +
             ", density=" + compose.activity.resources.displayMetrics.density +
             ", fontScale=" + compose.activity.resources.configuration.fontScale)
+        android.util.Log.i("PyriteNavigationTest", label + ": " + windowGeometry())
+    }
+
+    private data class WindowGeometry(
+        val width: Int, val height: Int, val y: Float, val bars: androidx.core.graphics.Insets?
+    )
+
+    private fun windowGeometry() = compose.runOnIdle {
+        val root = compose.activity.findViewById<android.view.View>(android.R.id.content)
+        WindowGeometry(root.width, root.height, root.y,
+            androidx.core.view.ViewCompat.getRootWindowInsets(root)
+                ?.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()))
     }
 
     private fun scrollPosition() = compose.onNode(hasScrollAction()).fetchSemanticsNode()

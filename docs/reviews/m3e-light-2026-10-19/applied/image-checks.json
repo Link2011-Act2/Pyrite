@@ -1,0 +1,98 @@
+[
+  {
+    "image": "palette-b-applied-expressive-dark-dynamic-about.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "D3B3171811670D14900A568D63DDB4561EDC04D06A6D69F5C63B70DF857CDACE"
+  },
+  {
+    "image": "palette-b-applied-expressive-dark-dynamic-settings.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "6ACF4832BAE21303D40FD78CF395703F62E2509F35CC7E60E04D14A0DB072911"
+  },
+  {
+    "image": "palette-b-applied-expressive-dark-static-about.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "8D5F9D1F6E0400CD389F855EE57F5F4E8734E55E335A61B0B176DBA109A47328"
+  },
+  {
+    "image": "palette-b-applied-expressive-dark-static-settings.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "BB14AE8EA709C6E498BE42FA215FCBF1584B1291AF696ED0C9D7DE562A9407D8"
+  },
+  {
+    "image": "palette-b-applied-expressive-light-dynamic-about.png",
+    "reference": "approved-b",
+    "identical": true,
+    "sha256": "13CE6B32A4191511846FEA21357A1371809B0CDDD58B3E593B397FE0682201F0"
+  },
+  {
+    "image": "palette-b-applied-expressive-light-dynamic-settings.png",
+    "reference": "approved-b",
+    "identical": true,
+    "sha256": "12680C08CE18A7AE82D748E43DDE8E53DA496A793B75266BB382CD488908A8F9"
+  },
+  {
+    "image": "palette-b-applied-expressive-light-static-about.png",
+    "reference": "approved-b",
+    "identical": true,
+    "sha256": "B105BBE185A3A32E37C5562401076512DA10FB57D5516A487DC6E387D1F9348F"
+  },
+  {
+    "image": "palette-b-applied-expressive-light-static-settings.png",
+    "reference": "approved-b",
+    "identical": true,
+    "sha256": "7A61BE7A53CE97F1A87B395DC85FD28433D1D14BBD07891FBBCF39EC01E8FFAE"
+  },
+  {
+    "image": "palette-b-applied-nothing-dark-dynamic-about.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "1F43BC66B3EF3A5A51382693234FA7BC2FDDE57B4FDC1667A5AECDF56455D577"
+  },
+  {
+    "image": "palette-b-applied-nothing-dark-dynamic-settings.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "AA52272E270C690300FA2B62B0C071A699450F50B8F32633EFC5762EF732CC2E"
+  },
+  {
+    "image": "palette-b-applied-nothing-dark-static-about.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "1F43BC66B3EF3A5A51382693234FA7BC2FDDE57B4FDC1667A5AECDF56455D577"
+  },
+  {
+    "image": "palette-b-applied-nothing-dark-static-settings.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "AA52272E270C690300FA2B62B0C071A699450F50B8F32633EFC5762EF732CC2E"
+  },
+  {
+    "image": "palette-b-applied-nothing-light-dynamic-about.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "97C836C2DC23CB3C28249830EF6B07BA45F00A53F8733254C38E44A4C935153F"
+  },
+  {
+    "image": "palette-b-applied-nothing-light-dynamic-settings.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "D4537BF6D6976C00A1610581518C0B5BF0823C96EFD24D27FFAC1611D19FBB5E"
+  },
+  {
+    "image": "palette-b-applied-nothing-light-static-about.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "97C836C2DC23CB3C28249830EF6B07BA45F00A53F8733254C38E44A4C935153F"
+  },
+  {
+    "image": "palette-b-applied-nothing-light-static-settings.png",
+    "reference": "unchanged",
+    "identical": true,
+    "sha256": "D4537BF6D6976C00A1610581518C0B5BF0823C96EFD24D27FFAC1611D19FBB5E"
+  }
+]

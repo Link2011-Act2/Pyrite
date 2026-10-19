@@ -2,6 +2,8 @@
 
 この文書を、従来の「Pyrite独自標準デザインへ変更する」方針より優先します。対象はM3EとNothing風の2種類です。通常Material 3の独立したenum値は削除しました。テーマの形状・余白・文字はPyriteで管理し、互換用のoverride引数は削除しました。
 
+2026-10-19追記：ユーザーが選択した[B配色](reviews/m3e-light-2026-10-19/adoption.md)をM3Eライトへ適用しています。背景はsurfaceContainerLow、共通カードはsurfaceContainerLowestです。元アプリとの差分として明示し、形状・文字・動作、Nothingおよびダーク配色は維持します。SourceParityTestはこの承認済みライト配色だけを参照描画へ適用して、元の寸法・配置を比較します。
+
 ## 再調査と移植対象
 
 元パスの基点は各リポジトリのapp/src/main/javaです。3アプリのソースは読み取りのみです。

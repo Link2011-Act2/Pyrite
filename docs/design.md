@@ -8,7 +8,7 @@ Material 3 1.5.0-beta01、Compose 1.12.0の既存基準を維持します。公�
 
 | 用途 | 採否 |
 | --- | --- |
-| M3Eテーマ | 公式MaterialExpressiveThemeとMotionScheme.expressive。色・文字・テーマ形状はScheduler由来 |
+| M3Eテーマ | 公式MaterialExpressiveThemeとMotionScheme.expressive。パレット基準・文字・形状はScheduler由来。ライトの背景/カードはユーザーが選択したBのSurface系ロール |
 | 設定行 | Scheduler/Glyph由来のSurface/Row、22/6dp・2dp間隔。存在するSegmentedListItemは元デザインを変えるため不採用 |
 | Switch / Radio | 公式部品。M3E Switchは公式Check/Closeアイコン。親行を単一操作にする |
 | Nothing風 | Glyphの色・文字・連結行。専有フォントなし。通常MaterialThemeを基盤とするが独立した通常M3スタイルは提供しない |
@@ -23,6 +23,8 @@ SettingsGroupは可視行だけを収集し、一意のkeyでremember状態と�
 PyriteThemeはM3EとNothingで公式テーマの親構造が異なります。movableContentOfとrememberUpdatedStateで呼び出し側のcomposition identityと最新callbackを維持します。テーマ変更で保存値を初期化しません。
 
 PyriteThemeの入力はstyle / darkTheme / dynamicColor / contentです。形状・文字・固定パレットはライブラリで管理します。不要な互換APIは削除しました。現行APIと判断理由は[public-api.md](public-api.md)を参照してください。
+
+M3Eライトは選択中の公式Dynamic Colorまたは固定パレットからsurfaceContainerLowを背景、surfaceContainerLowestをPyrite共通カードへ使います。公式ColorSchemeのsurfaceContainerHighは変更せず、カード側の内部ヘルパーで選択します。明暗判定にはPyriteThemeのdarkThemeを内部CompositionLocalで渡し、色の明度から推測しません。公開引数は増やしていません。[B採用記録](reviews/m3e-light-2026-10-19/adoption.md)を参照してください。
 
 公式参照：
 

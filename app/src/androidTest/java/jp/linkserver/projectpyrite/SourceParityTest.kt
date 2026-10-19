@@ -33,6 +33,12 @@ class SourceParityTest {
         var specimen by mutableStateOf("about")
         compose.setContent {
             PyriteTheme(style, darkTheme = dark, dynamicColor = false) {
+                // Keep the source geometry; the approved B palette intentionally changes
+                // M3E light card fill. Only the reference functions still read the old High role.
+                val colors = MaterialTheme.colorScheme
+                val referenceColors = if (source && style == PyriteStyle.Material3Expressive && !dark)
+                    colors.copy(surfaceContainerHigh = colors.surfaceContainerLowest) else colors
+                MaterialTheme(colorScheme = referenceColors) {
                 Box(Modifier.width(360.dp).background(MaterialTheme.colorScheme.background).testTag("specimen")) {
                     val summary = if (specimen == "switch-empty") "" else "Keep this setting enabled"
                     when (specimen) {
@@ -61,6 +67,7 @@ class SourceParityTest {
                             item("about") { SettingsNavigationItem("About", {}, summary = "Version and application details") }
                         }
                     }
+                }
                 }
             }
         }

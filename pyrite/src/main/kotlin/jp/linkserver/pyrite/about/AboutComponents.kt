@@ -33,7 +33,7 @@ fun AboutActionGroup(actions: List<AboutAction>, onAction: (AboutAction) -> Unit
             actions.forEachIndexed { index, action ->
                 androidx.compose.runtime.key(action.key) {
                     Surface(shape = PyriteDefaults.connectedShape(index == 0, index == actions.lastIndex),
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+                        color = pyriteCardColor()) {
                         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 18.dp),
                             verticalArrangement = Arrangement.spacedBy(14.dp)) {
                             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -65,7 +65,7 @@ fun AboutUpdateCard(description: String, status: String, actionLabel: String, on
     enabled: Boolean = true
 ) {
     Surface(modifier.fillMaxWidth(), RoundedCornerShape(22.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+        color = pyriteCardColor()) {
         Column {
             Text(description, Modifier.padding(horizontal = 22.dp, vertical = 18.dp),
                 style = MaterialTheme.typography.bodyMedium, lineHeight = 22.sp,

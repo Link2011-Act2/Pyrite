@@ -1,0 +1,98 @@
+[
+  {
+    "phase": "applied",
+    "theme": "expressive-light-static",
+    "settingsBackground": "#E2EBF0",
+    "aboutBackground": "#E2EBF0",
+    "card": "#F2F8FB",
+    "primary": "#0E5E76",
+    "high": "#C7D4DC",
+    "highest": "#B9C8D1",
+    "bodyContrast": 16.105341536202445,
+    "summaryContrast": 8.711767546785683
+  },
+  {
+    "phase": "applied",
+    "theme": "expressive-light-dynamic",
+    "settingsBackground": "#F4F3FA",
+    "aboutBackground": "#F4F3FA",
+    "card": "#FFFFFF",
+    "primary": "#495D92",
+    "high": "#E8E7EF",
+    "highest": "#E3E2E9",
+    "bodyContrast": 17.175712674619,
+    "summaryContrast": 9.366602946156245
+  },
+  {
+    "phase": "applied",
+    "theme": "expressive-dark-static",
+    "settingsBackground": "#0E1519",
+    "aboutBackground": "#0A1013",
+    "card": "#26313A",
+    "primary": "#8DD3EE",
+    "high": "#26313A",
+    "highest": "#2F3C46",
+    "bodyContrast": 10.25765194188175,
+    "summaryContrast": 7.824281941600312
+  },
+  {
+    "phase": "applied",
+    "theme": "expressive-dark-dynamic",
+    "settingsBackground": "#121318",
+    "aboutBackground": "#121318",
+    "card": "#292A2F",
+    "primary": "#B2C5FF",
+    "high": "#292A2F",
+    "highest": "#33343A",
+    "bodyContrast": 11.129340357437835,
+    "summaryContrast": 8.429848663248908
+  },
+  {
+    "phase": "applied",
+    "theme": "nothing-light-static",
+    "settingsBackground": "#EDEDED",
+    "aboutBackground": "#EDEDED",
+    "card": "#FFFFFF",
+    "primary": "#000000",
+    "high": "#FFFFFF",
+    "highest": "#FFFFFF",
+    "bodyContrast": 21,
+    "summaryContrast": 7.339630843301721
+  },
+  {
+    "phase": "applied",
+    "theme": "nothing-light-dynamic",
+    "settingsBackground": "#EDEDED",
+    "aboutBackground": "#EDEDED",
+    "card": "#FFFFFF",
+    "primary": "#000000",
+    "high": "#FFFFFF",
+    "highest": "#FFFFFF",
+    "bodyContrast": 21,
+    "summaryContrast": 7.339630843301721
+  },
+  {
+    "phase": "applied",
+    "theme": "nothing-dark-static",
+    "settingsBackground": "#000000",
+    "aboutBackground": "#000000",
+    "card": "#121212",
+    "primary": "#FFFFFF",
+    "high": "#121212",
+    "highest": "#181818",
+    "bodyContrast": 18.733663748203206,
+    "summaryContrast": 12.145786284882863
+  },
+  {
+    "phase": "applied",
+    "theme": "nothing-dark-dynamic",
+    "settingsBackground": "#000000",
+    "aboutBackground": "#000000",
+    "card": "#121212",
+    "primary": "#FFFFFF",
+    "high": "#121212",
+    "highest": "#181818",
+    "bodyContrast": 18.733663748203206,
+    "summaryContrast": 12.145786284882863
+  }
+]

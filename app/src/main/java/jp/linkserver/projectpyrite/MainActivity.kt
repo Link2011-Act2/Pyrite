@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.widget.Toast
 import android.app.Activity
 import androidx.core.view.WindowCompat
+import androidx.core.view.ViewCompat
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.net.toUri
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.*
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -39,15 +40,21 @@ import jp.linkserver.pyrite.theme.*
 import jp.linkserver.pyrite.screen.*
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalLayoutApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Set this before enableEdgeToEdge initializes a preserved decor. Android 15's
+        // initial PhoneWindow can otherwise keep its old content-insets applier on recreation.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
-        setContentView(ComposeView(this).apply {
-            // This is a fully Compose window: Android parents must not reapply these insets.
-            consumeWindowInsets = true
-            setContent { PyriteCatalog() }
-        })
+        setContent { PyriteCatalog() }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        // Compose starts after lifecycle ON_CREATE. A preserved window already has insets;
+        // deliver them now, before the first measure can clamp a restored ScrollState.
+        val content = findViewById<android.view.View>(android.R.id.content)
+        ViewCompat.getRootWindowInsets(content)?.let { ViewCompat.dispatchApplyWindowInsets(content, it) }
     }
 }
 

@@ -278,3 +278,60 @@ TalkBackの実操作、API 26端末・各メーカー実機、プロセス終了
 
 最終Maven版APKでは、カテゴリ／テーマ／Activity再生成の状態復元、条件付き確認の確定・取消、局所UI状態と最新callbackの3件を追加実行し、すべて成功しました（61.586秒）。ログは build/verification/catalog/maven-ui-tests.txt です。全件13件の後の最終整理は、重複説明・数量文言・未使用importの整理のみで、ライブラリの振る舞いは変えていません。全件の不要な再実行は避け、最終配布形態に関係するケースを選んで確認しました。
 最終AARのclasses.jarにMIT本文とNOTICEを確認し、AAR内のフォントファイルは0件でした。今回起動した検証AVDは終了しました。
+
+## 2026-10-19：168pxスクロール復元の修正と画面遷移の最終確認
+
+作業開始時はmasterの`c510c24`でクリーンでした。前日の変更はこのコミットへ保存されていました。前回最後のInsets修正候補を再ビルドせずに実行し、707→539pxの失敗を再確認してから計測しました。
+
+保存値は707pxへ復元されますが、Insetsが0の初回measureではviewportが1184pxになり、公式ScrollStateが539pxへクランプしていました。最終viewportは1016px、maxは707pxへ戻るため、168pxが失われます。Android 15初期のWindow再利用でもInsets適用先が変わり、contentが720×1112/y=132へ縮む問題がありました。原因と段階的な切り分けは[scroll-restoration.md](scroll-restoration.md)に記録しています。
+
+カタログActivityでDecor初期化前にedge-to-edgeを設定し、Lifecycle ON_CREATE後のonPostCreateで既存Insetsを初回measure前に同期配信しました。公開API・保存形式・依存バージョン・遷移仕様は変更していません。不要になったLocalPyriteScaffoldInsetsと明示的ComposeViewの候補コード、一時的な製品計測ログは除去しました。
+
+### 最終ビルド・配布
+
+| 対象 | 結果 |
+| --- | --- |
+| AAR assembleRelease | 成功、184,681 bytes |
+| カタログ assembleDebug / assembleDebugAndroidTest | 成功 |
+| 既存SettingsGroupScopeTest | 1件成功、失敗0 |
+| ライブラリLint release | 問題なし |
+| カタログLint debug | エラー0、既存の依存更新警告9件 |
+| verify-published.ps1 | Maven発行、独立consumer、Maven版カタログすべて成功 |
+| Maven版カタログのテストAPK | 成功 |
+| ローカルAARと発行AAR | SHA-256一致 |
+
+AAR SHA-256は`03AC219BD8A357E1AC2EED72954B0CE5CC3FC7B0D888664E276ADF9B68B9FEF7`。前回候補前の確認済みAARとも一致し、今回のライブラリ整理で形状・アニメーション等の新しいバイナリ変更は生じていません。Window修正はカタログ側です。
+
+ログ：`build/navigation-restoration-final-build.txt`、`build/navigation-restoration-final-maven.txt`、`build/navigation-restoration-final-test-apk.txt`。JitPack/Maven Publish構成は変更せず、今回のリモートJitPack取得・Push・タグ/Release作成は実施していません。
+
+### 最終UI検証
+
+API 35のread-only Pixel_6a、720×1280px、density 240で、**最終発行AARを利用するMaven版カタログの11件すべて成功、失敗0（117.513秒）**。
+
+- CatalogFlowTest 8件：M3E/Nothingで末端位置を2回連続再生成して保持。M3Eは707px、Nothingは737px。位置・max・viewport・Compose root・Android content・Insetsを厳密に比較し、戻る/再訪時の位置と設定値も確認。
+- 同クラスで、4テーマ、設定→About→部品、階層設定の共有状態、カテゴリの局所状態、確認/取消、遷移中の再生成を維持。
+- NavigationUiTest 3件：元コードのヘッダー8条件（2スタイル×明暗×LTR/RTL）、前進/後退の18フレーム組が画素一致。300ms/幅1/5、fade、方向、clipと途中反転時の状態保持も成功。
+- 再生成前後の詳細画面PNGは両スタイルともファイルのSHA-256が同一。M3Eは`CDB1FC6CF95B85C7512B63B8577E0E712E0A821830C3377222F53C754AD2B912`、Nothingは`26380181C0B4EE1F5589124908BAF292375C65E7B2BE4635229584AD23F2980F`。
+
+最終ログ：`build/navigation-restoration-final-ui.txt`、`build/navigation-restoration-final-ui-logcat.txt`。64画像は`build/verification/navigation-restoration-final/`。元アプリ実APKの並列実行比較ではなく、参照関数を同一条件で描画した比較です。
+
+計測段階のcold boot直後にinstrumentationの起動ANRが1回発生しました。Process failed to complete startupをログで確認し、同じAPKを起動安定後に再実行して成功しています。最終11件実行は起動失敗なし。API 26/他メーカー実機、プロセス終了からの復帰、TalkBack実操作は今回未検証です。未変更部品の全画像テストは繰り返していません。
+
+GradleとAVDは順次実行し、いずれも停止済み。READMEは編集していません。既存3アプリは変更せず、Schedulerの既存3変更も保持。今回の変更は未コミット・未Pushです。
+
+## 2026-10-19：M3EライトB配色の採用
+
+ユーザーの選択に従い、M3Eライトだけ背景をsurfaceContainerLow、Pyrite共通カードをsurfaceContainerLowestへ変更しました。Dynamic Color ON/OFFを維持し、ColorScheme.surfaceContainerHighやprimary等の値は保持しています。公開API、形状、余白、文字、動作は変更していません。実装と画像は[B採用記録](reviews/m3e-light-2026-10-19/adoption.md)を参照してください。
+
+- **Maven版カタログの関連UIテスト15件成功、失敗0（247.294秒）**。
+- 採用済みB画像4枚と反映後4枚のSHA-256が一致。M3Eダーク/Nothingの変更前後12枚もSHA-256が一致。
+- 元コード参照14組は成功。12組が画素差0、Nothing/About明暗は各35画素（0.0121%、既定許容0.1%未満）。製品の変更前後では差分なし。
+- ヘッダー8条件・遷移18フレーム組、連続操作、テーマ/設定状態保持、確認/取消、拡大文字/狭幅、マスター背景不変/子設定無効化を確認。168px問題も再発なし（M3E707px、Nothing737pxを2回連続再生成後も保持）。
+- AAR/APK/テストAPK、既存JVMテスト1件、ローカルMaven発行、独立consumer、発行AARを使うカタログのビルド成功。
+- ライブラリLint問題なし、カタログLintはエラー0・既存の依存更新警告9件。
+
+AAR SHA-256（発行物と一致）：`A7A38916E32F8F2EC271DC2EB927D7ABFE4BC95D553FDE0CA0AE72ECDA8C393F`。
+
+ログは`build/palette-b-final-build.txt`、`build/palette-b-final-maven.txt`、`build/palette-b-final-test-apk.txt`、`build/palette-b-final-ui.txt`。画像131枚は`build/verification/palette-b-final/`、永続的なB画像4枚と照合JSONは`docs/reviews/m3e-light-2026-10-19/applied/`にあります。
+
+API 35の同じ専用read-only AVDでビルドと順次実行し、AVD/Gradleとも停止済み。API 26/他メーカー実機・全壁紙・TalkBack実操作は今回未検証です。既存3アプリ、README、依存版、配布構成は未変更。コミット・Push・タグ/Release作成は行っていません。
