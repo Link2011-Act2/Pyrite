@@ -1,4 +1,17 @@
 # Project Pyrite - Fool's Material 3
+
+アプリを作りすぎて面倒になったので、共通のUIをライブラリ化しました
+
+名前の由来は
+- GoogleとかNothingの純正品をわざわざ再実装した偽物である
+- 愚者が作ったOSS
+- 愚者しか使わないであろうOSS
+- トリッカル ピラ
+
+あたりから来てます
+
+以下、真面目なREADME
+
 複数のAndroidアプリで共通利用する、Jetpack Composeの設定画面・About画面ライブラリです。
 
 - Android Library `:pyrite`：状態を外部から渡す設定UIとAbout表示。
