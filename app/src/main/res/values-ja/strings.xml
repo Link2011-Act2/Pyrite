@@ -126,4 +126,13 @@
     <string name="navigation_details_extra">補足ビルド情報を表示</string>
     <string name="custom_fonts">カスタムフォント</string>
     <string name="custom_fonts_summary">タイトルをSerif、装飾文字をMonospaceにします。本文は変更しません。</string>
+    <string name="interactive_cards">操作できる連結カード</string>
+    <string name="slider_setting">パラメーター</string>
+    <string name="slider_description">ドラッグやアクセシビリティ操作を確認します。値変更と確定操作は別に通知されます。</string>
+    <string name="slider_value">%1$d%%</string>
+    <string name="slider_commits">完了した操作: %1$d</string>
+    <string name="reset_slider">パラメーターを戻す</string>
+    <string name="button_setting">ボタン付き設定項目</string>
+    <string name="run_action">アクションを実行</string>
+    <string name="slot_action_count">個別アクション: %1$d</string>
 </resources>

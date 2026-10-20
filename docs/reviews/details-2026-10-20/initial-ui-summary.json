@@ -1,0 +1,212 @@
+[
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "nothingAboutDetailsRetainScrollAndLocalStateAcrossBackAndRecreation",
+    "code": -2,
+    "error": "androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:"
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "aboutDetailsRetainScrollAndLocalStateAcrossBackAndRecreation",
+    "code": -2,
+    "error": "androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:"
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "settingsAboutComponentsAndRecreationUseTheLibrary",
+    "code": -2,
+    "error": "androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:"
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "catalogThemePickersPreserveStateAndRenderFourThemePairs",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "hierarchySharesStateAcrossNavigationThemeAndRecreation",
+    "code": -2,
+    "error": "androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:"
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "categoryStateSurvivesNavigationThemeAndActivityRecreation",
+    "code": -2,
+    "error": "java.lang.AssertionError: Action performScrollTo() failed."
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "recreationDuringRapidForwardBackKeepsTheCurrentDestination",
+    "code": -2,
+    "error": "androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:"
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "confirmationAndConditionalScreenKeepDraftAndCommittedValuesSeparate",
+    "code": -2,
+    "error": "androidx.test.espresso.base.RootViewPicker$RootViewWithoutFocusException: Waited for the root of the view hierarchy to have window focus and not request layout for 10 seconds. If you specified a non default root matcher, it may be picking a root that never takes focus. Root:"
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.CatalogFlowTest",
+    "test": "interactiveCardsRestoreSliderAndCommitCount",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.FontsUiTest",
+    "test": "catalogCanToggleTitleFontsWithoutChangingOrdinaryText",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.FontsUiTest",
+    "test": "optionalRolesPreserveDefaultsAndOnlyReplaceTheirOwnFamilies",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.M3SurfaceColorsTest",
+    "test": "productionSurfacesKeepStateGeometryAndTextContrast",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.MasterSwitchTest",
+    "test": "masterWrapsAtLargeFontInNarrowPane",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.MasterSwitchTest",
+    "test": "backgroundIsInvariantAndDependentValueIsRetainedInBothStylesAndColorModes",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.NavigationUiTest",
+    "test": "sourceHeadersMatchBothStylesLightDarkAndRtl",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.NavigationUiTest",
+    "test": "variableContentSizesUseGlyphsDefaultSizeTransform",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.NavigationUiTest",
+    "test": "transitionMatchesGlyphFramesTimingDirectionAndClipping",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.NavigationUiTest",
+    "test": "interruptedTransitionsKeepPerScreenScrollAndSaveableValues",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteComponentsTest",
+    "test": "choiceDialogSeparatesDraftCancelAndCommit",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteComponentsTest",
+    "test": "callerStateSurvivesStyleAndExplicitDarkModeChanges",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteComponentsTest",
+    "test": "switchesHaveOneTargetAndDisabledStateInEveryStyle",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteComponentsTest",
+    "test": "aboutSupportsNarrowWidthLargeTextAndAllThemePairs",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteComponentsTest",
+    "test": "keyedRowsKeepLocalStateWhenVisibleRowsAreInserted",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteExtendedComponentsTest",
+    "test": "conditionalRowsSettleAfterInterruptedSizeAnimation",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteExtendedComponentsTest",
+    "test": "localUiStateSurvivesExpressiveThemeBoundaryAndUsesLatestCallback",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteExtendedComponentsTest",
+    "test": "mosaicKeepsVersionAndMetadataActionsIndependent",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.PyriteExtendedComponentsTest",
+    "test": "richRowsStatusAndBusyActionsRespectSemanticsInFourThemes",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.SettingsControlsTest",
+    "test": "sliderDragFinishesOnceAndCardPaddingDoesNotChangeValue",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.SettingsControlsTest",
+    "test": "nestedControlsHaveIndependentTargetsAndSingleCallbacks",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.SourceParityTest",
+    "test": "splitNavigationAndSwitchHaveIndependentTargetsAndEnableConditions",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.SourceParityTest",
+    "test": "inlineAttributionDoesNotTriggerTheVersionAction",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.SourceParityTest",
+    "test": "compoundRadioKeepsSelectionAndRejectsDisabledChoices",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.SourceParityTest",
+    "test": "optionalMetadataAndUpdateStateRemainHostOwned",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.SourceParityTest",
+    "test": "sourceAboutAndSettingsMatchInBothStylesAndColorModes",
+    "code": 0,
+    "error": ""
+  },
+  {
+    "class": "jp.linkserver.projectpyrite.SourceParityTest",
+    "test": "aboutScreenShowsExplicitMetadataLinksAndSupplementaryContent",
+    "code": 0,
+    "error": ""
+  }
+]

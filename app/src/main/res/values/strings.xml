@@ -126,4 +126,13 @@
     <string name="navigation_details_extra">Show additional build information</string>
     <string name="custom_fonts">Custom fonts</string>
     <string name="custom_fonts_summary">Serif titles and monospace accents; body text stays unchanged.</string>
+    <string name="interactive_cards">Connected interactive cards</string>
+    <string name="slider_setting">Parameter</string>
+    <string name="slider_description">Drag or use accessibility actions. Commit is separate from value changes.</string>
+    <string name="slider_value">%1$d%%</string>
+    <string name="slider_commits">Completed gestures: %1$d</string>
+    <string name="reset_slider">Reset parameter</string>
+    <string name="button_setting">Button setting</string>
+    <string name="run_action">Run action</string>
+    <string name="slot_action_count">Independent actions: %1$d</string>
 </resources>

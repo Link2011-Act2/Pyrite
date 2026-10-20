@@ -9,10 +9,10 @@
 | Scheduler ui/components/AppSettingsComponents.kt AppSettingsScaffold | M3E設定も23sp/29sp・Medium・surfaceで一致。元実装は1行省略指定あり |
 | Glyph ui/SettingsScreen.kt SettingsHeader | Nothingヘッダーの基準。titleLarge（代替書体で22sp/32sp・Normal）、下2dp、includeFontPadding=false |
 | Glyph/Scheduler AboutScreen.kt | 各アプリのAboutはTopAppBarの既定タイトル。Pyriteでは共通ヘッダーを利用し、設定/Aboutのタイトル階層を揃える |
-| ShutUp ui/ShutterApp.kt screen_transition | AnimatedContentの式を移植。アプリ固有のscreenDepth・画面ID・backは移植しない |
-| Glyph ui/VisualizerApp.kt / Scheduler SettingsScreen.kt | 横方向遷移はあるが、時間指定やスライド量が異なるため今回の基準にはしない |
+| Glyph 53e568c ui/VisualizerApp.kt screen_transition | 2026-10-20から標準。引数なしslide/fade、幅1/5、既定SizeTransformを採用。階層・画面ID・backはホストが管理 |
+| ShutUpの旧tween遷移 / Scheduler SettingsScreen.kt | 標準遷移の基準から除外。旧Pyrite固定SHAを利用するアプリには影響しない |
 
-NothingのNType/Ndotは同梱せず、システムSansSerifを使います。Glyph Aboutの元ヘッダーには設定用の下2dp補正がありませんが、Pyriteの共通ヘッダーはGlyph設定の補正を両画面で使います。M3EはShutUp基準のため、Scheduler Aboutの既定タイトルより細く・小さくなります。独自に考案したタイトル書式ではありません。
+NothingのNType/Ndotは同梱せず、未指定時はシステムSansSerifを使います。利用アプリからの指定は[PyriteFonts](fonts.md)で渡せます。Glyph Aboutの元ヘッダーには設定用の下2dp補正がありませんが、Pyriteの共通ヘッダーはGlyph設定の補正を両画面で使います。M3EはShutUp基準のため、Scheduler Aboutの既定タイトルより細く・小さくなります。独自に考案したタイトル書式ではありません。
 
 PyriteScreenScaffoldの本文背景はsurfaceです。SettingsScreenもこれを使い、ShutUpとScheduler M3E設定に合わせます。AboutScreenの本文は既存のbackground（Nothingはsurface）を維持し、移植済みモザイクの切欠き色と揃えます。モザイクの形状・余白・文字設定は変更していません。色は既存のPyriteThemeで決まり、元ShutUpのパレットそのものへ変更していません。
 
@@ -56,16 +56,15 @@ contentでは必ず渡されたscreenに応じて画面を描画してくださ�
 
 ## 遷移仕様
 
-| 対象 | 元ShutUpと共通の値 |
+| 対象 | 旧Glyphと共通の仕様 |
 | --- | --- |
-| 横スライド | 300ms、画面幅の1/5 |
-| 入場fadeIn | 220ms、遅延40ms |
-| 退場fadeOut | 140ms |
-| easing | FastOutSlowInEasing。fadeのtweenも元の既定値を維持 |
-| 向き | 進むときと戻るときで反転 |
-| 境界 | fillMaxSize + clipToBounds |
-| サイズ変化 | using(null)でSizeTransformを無効化 |
-| 画面状態 | 公式rememberSaveableStateHolder / SaveableStateProvider |
+| 横スライド | 画面幅の1/5。引数なしslideIn/OutHorizontallyのspring |
+| 入場/退場fade | 引数なしfadeIn/fadeOutのspring。独自の時間・遅延を追加しない |
+| spring | Compose既定のStiffnessMediumLow。1.7.2 / 1.12.0の公式ソースで既定値一致を確認 |
+| 向き | Forwardは右から、Backwardは左から入場 |
+| 境界・サイズ | 元のSurface→Box→AnimatedContentと既定SizeTransform(clip=true)。独自clipToBoundsとusing(null)を削除 |
+| 画面状態 | 公式rememberSaveableStateHolder / SaveableStateProviderを維持 |
+
 
 方向はAnimatedContentのinitialState / targetStateから呼び出し側が決めます。ライブラリには画面名や順位表を持ちません。横移動は元と同じ物理方向で、RTLでも自動反転はしません。戻る矢印自体はRTLで反転します。
 
@@ -79,6 +78,8 @@ contentKeyは保持する画面ごとに一意・安定、AndroidのBundleへ保
 
 アプリ側のCatalogPageが階層の順位と表示内容を持ち、Aboutを開いた元画面と戻る先を保持します。階層設定の共有値はカタログroot、画面固有値とスクロールは各画面のrememberSaveableで保持します。BackHandlerはrootだけに配置し、カテゴリ内部のAnimatedContentと状態Holderは削除しました。部品自体の展開アニメーションは維持します。
 
-元ShutUpの画面全体APKを同時に動かす比較ではなく、元関数の抽出fixtureを同じCompose版・テーマ・サイズで描画して比較します。実測のフレーム・操作結果と未検証範囲は[検証記録](verification.md)を参照してください。
+旧Glyph 53e568cのtransitionSpecとレイアウトを抽出したfixtureを同じCompose版・テーマ・サイズで描画して比較します。旧ShutUp参照fixtureも履歴比較用に残しています。実測のフレーム・操作結果と未検証範囲は[検証記録](verification.md)を参照してください。
 
 カタログのActivity再生成で起きた168pxのスクロールずれは、Window初期化と初回Insets配信の順序を修正しています。ライブラリは公式ScaffoldのInsetsと標準の状態保存を使用し、Window操作は利用側Activityの責務です。原因・計測・修正の範囲は[スクロール復元の調査記録](scroll-restoration.md)を参照してください。
+
+2026-10-20の変更点とShutUp更新時の影響は[カードと標準遷移の拡充](details-cards-and-motion.md)を参照してください。既存の固定SHA依存は更新しない限り動作が変わりません。

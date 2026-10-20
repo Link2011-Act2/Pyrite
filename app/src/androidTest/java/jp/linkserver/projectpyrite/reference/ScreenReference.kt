@@ -70,3 +70,22 @@ internal fun ShutterTransitionReference(screen: Int, content: @Composable (Int) 
         }
     }
 }
+
+/** Exact transitionSpec/layout from Glyph 53e568c; Int ordering replaces its Screen.ordinal only. */
+@Composable
+internal fun GlyphTransitionReference(screen: Int, content: @Composable (Int) -> Unit) {
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+        Box(Modifier.fillMaxSize()) {
+            AnimatedContent(targetState = screen, transitionSpec = {
+                val forward = targetState > initialState
+                if (forward) {
+                    (slideInHorizontally { it / 5 } + fadeIn()) togetherWith
+                        (slideOutHorizontally { -it / 5 } + fadeOut())
+                } else {
+                    (slideInHorizontally { -it / 5 } + fadeIn()) togetherWith
+                        (slideOutHorizontally { it / 5 } + fadeOut())
+                }
+            }, label = "screen_transition") { content(it) }
+        }
+    }
+}

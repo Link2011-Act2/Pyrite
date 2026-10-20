@@ -152,6 +152,9 @@ private fun ColumnScope.RowsCatalog() {
 
 @Composable
 private fun ColumnScope.CardsCatalog() {
+    var slider by rememberSaveable { mutableFloatStateOf(.5f) }
+    var commits by rememberSaveable { mutableIntStateOf(0) }
+    var slotActions by rememberSaveable { mutableIntStateOf(0) }
     var loading by rememberSaveable { mutableStateOf(false) }
     var enabled by rememberSaveable { mutableStateOf(true) }
     var clicks by rememberSaveable { mutableIntStateOf(0) }
@@ -164,6 +167,29 @@ private fun ColumnScope.CardsCatalog() {
             SettingsStatusItem(title = stringResource(R.string.update_status),
                 status = stringResource(if (loading) R.string.checking else R.string.state_ready),
                 summary = stringResource(R.string.status_description), loading = loading)
+        }
+    }
+    SettingsGroup(title = stringResource(R.string.interactive_cards)) {
+        item("slider") {
+            SettingsSliderItem(stringResource(R.string.slider_setting),
+                stringResource(R.string.slider_value, (slider * 100).toInt()), slider, { slider = it }, 0f..1f,
+                summary = stringResource(R.string.slider_description), enabled = enabled,
+                onValueChangeFinished = { commits++ }) {
+                Text(stringResource(R.string.slider_commits, commits))
+            }
+        }
+        item("button") {
+            SettingsButtonItem(stringResource(R.string.button_setting), stringResource(R.string.run_action),
+                { slotActions++ }, summary = stringResource(R.string.slot_action_count, slotActions), enabled = enabled)
+        }
+        item("custom") {
+            SettingsContentCard {
+                Row(Modifier.padding(horizontal = 22.dp, vertical = 18.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    TextButton({ slider = .5f }, enabled = enabled) { Text(stringResource(R.string.reset_slider)) }
+                    TextButton({ slotActions++ }, enabled = enabled) { Text(stringResource(R.string.apply)) }
+                }
+            }
         }
     }
     SettingsActionCard(

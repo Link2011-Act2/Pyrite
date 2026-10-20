@@ -1,0 +1,6 @@
+{
+  "pyrite\\build\\reports\\lint-results-release.xml": {},
+  "app\\build\\reports\\lint-results-debug.xml": {
+    "Warning": 9
+  }
+}

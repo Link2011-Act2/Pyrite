@@ -19,6 +19,7 @@ class MainActivity : ComponentActivity() {
             var checked by rememberSaveable { mutableStateOf(false) }
             var detail by rememberSaveable { mutableStateOf(true) }
             var screen by rememberSaveable { mutableIntStateOf(0) }
+            var value by rememberSaveable { mutableFloatStateOf(.5f) }
             PyriteTheme(fonts = PyriteFonts(title = FontFamily.Serif, accent = FontFamily.Monospace)) {
                 PyriteScreenTransition(screen, { initial, target ->
                     if (target > initial) PyriteNavigationDirection.Forward
@@ -44,6 +45,11 @@ class MainActivity : ComponentActivity() {
                         navigationIcon = { PyriteBackButton({ screen = 0 }, "Back") }) {
                         SettingsMasterSwitch("Use feature", checked, { checked = it })
                         SettingsGroup(title = "Details") {
+                            item("slider") {
+                                SettingsSliderItem("Published parameter", value.toString(), value,
+                                    { value = it }, 0f..1f, enabled = checked)
+                            }
+                            item("button") { SettingsButtonItem("Action", "Reset", { value = .5f }) }
                             item("detail") {
                                 SettingsSwitchItem("Published AAR is in use", detail, { detail = it },
                                     enabled = checked)

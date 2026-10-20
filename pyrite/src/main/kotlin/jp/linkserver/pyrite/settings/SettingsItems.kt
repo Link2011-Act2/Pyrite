@@ -190,7 +190,7 @@ fun SettingsStatusItem(title: String, status: String, modifier: Modifier = Modif
         Modifier.size(22.dp).alpha(if (enabled) 1f else .38f), tint = color)
 }
 
-@Composable private fun RowSurface(modifier: Modifier, onClick: (() -> Unit)? = null,
+@Composable internal fun RowSurface(modifier: Modifier, onClick: (() -> Unit)? = null,
     enabled: Boolean = true, content: @Composable () -> Unit
 ) {
     val position = LocalGroupPosition.current

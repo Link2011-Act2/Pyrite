@@ -1,10 +1,9 @@
-// Ported from ShutUp ShutterApp.kt screen_transition.
+// Ported from Glyph Barty 53e568c VisualizerApp.kt screen_transition.
 // Copyright (c) 2026 Azul1nk. MIT; see NOTICE.md.
 package jp.linkserver.pyrite.screen
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -12,13 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 
-/** Physical horizontal direction, matching ShutUp: forward enters from the right, backward from left. */
+/** Physical direction: forward enters from the right, backward from the left. */
 enum class PyriteNavigationDirection { Forward, Backward }
 
 /**
- * A single, clipped transition host with ShutUp's timing and per-screen saveable state.
+ * Glyph's default spring slide/fade with per-screen saveable state.
+ * Uses the official default SizeTransform (including its clipping), without a second viewport clip.
  *
  * [direction] compares the actual initial/target states, including interrupted transitions.
  * Navigation, back handling and hierarchy belong to the caller. Do not nest screen transition hosts.
@@ -36,20 +35,19 @@ fun <T : Any> PyriteScreenTransition(
     content: @Composable (T) -> Unit
 ) {
     Surface(modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-        AnimatedContent(
-            targetState = targetState,
-            modifier = Modifier.fillMaxSize().clipToBounds(),
-            transitionSpec = {
-                val sign = if (direction(initialState, targetState) == PyriteNavigationDirection.Forward) 1 else -1
-                ((slideInHorizontally(tween(300, easing = FastOutSlowInEasing)) { sign * it / 5 } +
-                    fadeIn(tween(220, delayMillis = 40))) togetherWith
-                    (slideOutHorizontally(tween(300, easing = FastOutSlowInEasing)) { -sign * it / 5 } +
-                        fadeOut(tween(140)))).using(null)
-            },
-            contentKey = contentKey,
-            label = "screen_transition"
-        ) { screen ->
-            stateHolder.SaveableStateProvider(contentKey(screen)) { content(screen) }
+        Box(Modifier.fillMaxSize()) {
+            AnimatedContent(
+                targetState = targetState,
+                transitionSpec = {
+                    val sign = if (direction(initialState, targetState) == PyriteNavigationDirection.Forward) 1 else -1
+                    (slideInHorizontally { sign * it / 5 } + fadeIn()) togetherWith
+                        (slideOutHorizontally { -sign * it / 5 } + fadeOut())
+                },
+                contentKey = contentKey,
+                label = "screen_transition"
+            ) { screen ->
+                stateHolder.SaveableStateProvider(contentKey(screen)) { content(screen) }
+            }
         }
     }
 }

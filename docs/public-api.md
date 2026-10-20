@@ -17,7 +17,7 @@
 | PyriteTheme.colorScheme / typography / shapes / nothingFontFamily | Pyrite標準値。style / darkTheme / dynamicColorのみを指定 |
 | 通常Material 3の独立スタイル | Material3ExpressiveまたはNothing（独立スタイル廃止は前回実施済み） |
 
-detailsの位置から意味を推測する内部adapter、4件目以降を自動描画する互換経路も削除しました。追加情報はAboutScreenのcontentへ明示します。描画補助SourceCardとRowSurfaceはprivate、共有のグループ位置・寸法・テーマ資源はinternalです。未使用の寸法定数を削除し、連結角丸と説明文の文字設定の重複を整理しました。
+detailsの位置から意味を推測する内部adapter、4件目以降を自動描画する互換経路も削除しました。追加情報はAboutScreenのcontentへ明示します。描画補助SourceCardはprivate、設定カードで共有するRowSurfaceはinternal、共有のグループ位置・寸法・テーマ資源はinternalです。未使用の寸法定数を削除し、連結角丸と説明文の文字設定の重複を整理しました。
 
 ## 残したAPIと役割
 
@@ -63,4 +63,8 @@ PyriteThemeの公式テーマ間を移動する処理は互換adapterではな�
 
 ## 画面の共通構造
 
-screenパッケージにPyriteScreenScaffold / PyriteBackButton / PyriteScreenTransition / PyriteNavigationDirectionを追加しました。元のShutUp Scaffold・遷移を共有するAPIで、Navigationや画面名はホストが管理します。設定/Aboutの内容slotはそのまま利用できます。[元実装との差分・使用例・状態保持](navigation.md)を参照してください。
+screenパッケージにPyriteScreenScaffold / PyriteBackButton / PyriteScreenTransition / PyriteNavigationDirectionを追加しました。元のShutUp Scaffoldと旧Glyph Bartyの標準spring遷移を共有するAPIで、Navigationや画面名はホストが管理します。設定/Aboutの内容slotはそのまま利用できます。[元実装との差分・使用例・状態保持](navigation.md)を参照してください。
+
+## 操作を内包するカード
+
+SettingsContentCard、SettingsSlider、SettingsSliderItem、SettingsButtonItemを追加しました。SettingsGroupが連結形状と2dp間隔を管理します。カード面にクリックを設けず、子の公式Button/Sliderが個別に操作を受けます。[API・移植方針](details-cards-and-motion.md)を参照してください。

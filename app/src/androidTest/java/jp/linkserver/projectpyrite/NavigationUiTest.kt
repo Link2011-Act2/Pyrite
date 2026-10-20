@@ -59,14 +59,14 @@ class NavigationUiTest {
         compose.runOnIdle { assertEquals(1, clicks) }
     }
 
-    @Test fun transitionMatchesShutUpFramesTimingDirectionAndClipping() {
+    @Test fun transitionMatchesGlyphFramesTimingDirectionAndClipping() {
         var screen by mutableStateOf(0)
         compose.mainClock.autoAdvance = false
         compose.setContent {
             PyriteTheme(dynamicColor = false) {
                 Column {
                     Frame("reference") {
-                        ShutterTransitionReference(screen) { page -> Specimen("ref", page) }
+                        GlyphTransitionReference(screen) { page -> Specimen("ref", page) }
                     }
                     Frame("actual") {
                         PyriteScreenTransition(screen, ::direction,
@@ -79,7 +79,7 @@ class NavigationUiTest {
             compose.runOnIdle { screen = destination }
             compose.mainClock.advanceTimeByFrame()
             var elapsed = 0L
-            for (time in listOf(0L, 32L, 48L, 96L, 144L, 224L, 272L, 304L, 336L)) {
+            for (time in listOf(0L, 32L, 48L, 96L, 144L, 224L, 304L, 448L, 640L, 960L, 1600L)) {
                 if (time > elapsed) compose.mainClock.advanceTimeBy(time - elapsed, ignoreFrameDuration = true)
                 elapsed = time
                 assertFramesEqual("motion-" + destination + "-" + time)
@@ -94,7 +94,7 @@ class NavigationUiTest {
                     assertEquals("Entry starts at one fifth of the screen width",
                         (viewport.right - viewport.left).value * sign / 5f, offset.value, 1f)
                 }
-                if (time >= 304L) assertEquals("Slide has finished after 300ms", 0f, offset.value, .1f)
+                if (time >= 960L) assertEquals("Default spring has settled", 0f, offset.value, .1f)
             }
             compose.onNodeWithTag("actual-screen-" + (1 - destination)).assertDoesNotExist()
         }
@@ -123,7 +123,7 @@ class NavigationUiTest {
             compose.runOnIdle { screen = destination }
             compose.mainClock.advanceTimeBy(48)
         }
-        compose.mainClock.advanceTimeBy(400)
+        compose.mainClock.advanceTimeBy(1600)
         compose.mainClock.autoAdvance = true
         compose.onAllNodesWithTag("scroll-0").assertCountEquals(1)
         assertEquals(savedScroll, scrollValue("scroll-0"), .1f)
@@ -134,6 +134,28 @@ class NavigationUiTest {
 
     private fun direction(initial: Int, target: Int) =
         if (target > initial) PyriteNavigationDirection.Forward else PyriteNavigationDirection.Backward
+
+    @Test fun variableContentSizesUseGlyphsDefaultSizeTransform() {
+        var screen by mutableStateOf(0)
+        compose.mainClock.autoAdvance = false
+        compose.setContent { PyriteTheme(dynamicColor = false) { Column {
+            Frame("reference") { GlyphTransitionReference(screen) { VariableSpecimen(it) } }
+            Frame("actual") { PyriteScreenTransition(screen, ::direction) { VariableSpecimen(it) } }
+        } } }
+        for (destination in listOf(1, 0)) {
+            compose.runOnIdle { screen = destination }
+            compose.mainClock.advanceTimeByFrame()
+            repeat(12) { index ->
+                compose.mainClock.advanceTimeBy(96)
+                assertFramesEqual("size-" + destination + "-" + index)
+            }
+        }
+    }
+
+    @Composable private fun VariableSpecimen(page: Int) {
+        Box(Modifier.size(if (page == 0) 120.dp else 250.dp, if (page == 0) 70.dp else 150.dp)
+            .background(if (page == 0) Color.Red else Color.Blue))
+    }
 
     @Composable private fun Frame(tag: String, content: @Composable () -> Unit) {
         Box(Modifier.size(360.dp, 200.dp).background(Color.Magenta).testTag(tag)

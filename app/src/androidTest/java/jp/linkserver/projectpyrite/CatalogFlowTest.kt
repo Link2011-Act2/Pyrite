@@ -15,6 +15,30 @@ class CatalogFlowTest {
 
     private fun text(id: Int) = compose.activity.getString(id)
 
+    @Test fun interactiveCardsRestoreSliderAndCommitCount() {
+        compose.onNodeWithContentDescription(text(R.string.components)).performClick()
+        compose.onNodeWithText(text(R.string.catalog_cards)).performScrollTo().performClick()
+        compose.onNodeWithContentDescription(text(R.string.slider_setting)).performScrollTo()
+            .performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) { it(.8f) }
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithContentDescription(text(R.string.slider_setting)).performScrollTo()
+            .assertRangeInfoEquals(androidx.compose.ui.semantics.ProgressBarRangeInfo(.8f, 0f..1f))
+        compose.onNodeWithText(compose.activity.getString(R.string.slider_commits, 1)).assertExists()
+        for ((label, style) in listOf("Material 3 Expressive" to "m3e", text(R.string.nothing_style) to "nothing")) {
+            compose.onNodeWithContentDescription(text(R.string.design_style)).performClick()
+            compose.onNode(hasText(label) and hasAnyAncestor(isDialog())).performClick()
+            compose.onNode(hasText(text(R.string.apply)) and hasAnyAncestor(isDialog())).performClick()
+            for ((mode, name) in listOf(R.string.light_mode to "light", R.string.dark_mode to "dark")) {
+                compose.onNodeWithContentDescription(text(R.string.color_mode)).performClick()
+                compose.onNode(hasText(text(mode)) and hasAnyAncestor(isDialog())).performClick()
+                compose.onNode(hasText(text(R.string.apply)) and hasAnyAncestor(isDialog())).performClick()
+                compose.onNodeWithContentDescription(text(R.string.slider_setting)).performScrollTo()
+                    .assertRangeInfoEquals(androidx.compose.ui.semantics.ProgressBarRangeInfo(.8f, 0f..1f))
+                capture("interactive-cards-" + style + "-" + name)
+            }
+        }
+    }
+
     @Test fun settingsAboutComponentsAndRecreationUseTheLibrary() {
         compose.onNodeWithText(text(R.string.notifications)).performScrollTo().performClick()
             .assertIsOff()
@@ -63,7 +87,7 @@ class CatalogFlowTest {
         compose.onNode(hasText(text(R.string.checking)) and hasClickAction()).performScrollTo().assertIsNotEnabled()
         compose.onNodeWithContentDescription(text(R.string.design_style)).performClick()
         compose.onNode(hasText(text(R.string.nothing_style)) and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText(text(R.string.apply)).performClick()
+        compose.onNode(hasText(text(R.string.apply)) and hasAnyAncestor(isDialog())).performClick()
         compose.onNodeWithText(text(R.string.loading_preview)).performScrollTo().assertIsOn()
         compose.activityRule.scenario.recreate()
         compose.onNodeWithText(text(R.string.loading_preview)).performScrollTo().assertIsOn()
@@ -118,7 +142,7 @@ class CatalogFlowTest {
         compose.onNodeWithText(text(R.string.use_autocorrection)).assertIsOff()
         compose.onNodeWithContentDescription(text(R.string.design_style)).performClick()
         compose.onNode(hasText(text(R.string.nothing_style)) and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText(text(R.string.apply)).performClick()
+        compose.onNode(hasText(text(R.string.apply)) and hasAnyAncestor(isDialog())).performClick()
         compose.onNodeWithText(text(R.string.undo_correction)).assertIsNotEnabled().assertIsOn()
         pressBack()
         compose.onNode(isToggleable()).assertIsOff().performClick().assertIsOn()
@@ -230,7 +254,7 @@ class CatalogFlowTest {
     private fun choose(title: Int, label: String) {
         compose.onNodeWithText(text(title)).performScrollTo().performClick()
         compose.onNode(hasText(label) and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText(text(R.string.apply)).performClick()
+        compose.onNode(hasText(text(R.string.apply)) and hasAnyAncestor(isDialog())).performClick()
     }
 
     private fun capture(name: String) {
