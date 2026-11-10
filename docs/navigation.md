@@ -14,7 +14,7 @@
 
 NothingのNType/Ndotは同梱せず、未指定時はシステムSansSerifを使います。利用アプリからの指定は[PyriteFonts](fonts.md)で渡せます。Glyph Aboutの元ヘッダーには設定用の下2dp補正がありませんが、Pyriteの共通ヘッダーはGlyph設定の補正を両画面で使います。M3EはShutUp基準のため、Scheduler Aboutの既定タイトルより細く・小さくなります。独自に考案したタイトル書式ではありません。
 
-PyriteScreenScaffoldの本文背景はsurfaceです。SettingsScreenもこれを使い、ShutUpとScheduler M3E設定に合わせます。AboutScreenの本文は既存のbackground（Nothingはsurface）を維持し、移植済みモザイクの切欠き色と揃えます。モザイクの形状・余白・文字設定は変更していません。色は既存のPyriteThemeで決まり、元ShutUpのパレットそのものへ変更していません。
+PyriteScreenScaffoldとSettingsScreenの本文背景は、M3Eライトでは採用済みB配色のsurfaceContainerLow、それ以外ではsurfaceです。AboutScreenはM3Eライトで同じsurfaceContainerLow、M3Eダークでbackground、Nothingでsurfaceを使い、モザイクの切欠き色と揃えます。配色はPyriteThemeで管理します。[設計方針](design.md)を参照してください。
 
 ## 公開API
 
@@ -78,8 +78,8 @@ contentKeyは保持する画面ごとに一意・安定、AndroidのBundleへ保
 
 アプリ側のCatalogPageが階層の順位と表示内容を持ち、Aboutを開いた元画面と戻る先を保持します。階層設定の共有値はカタログroot、画面固有値とスクロールは各画面のrememberSaveableで保持します。BackHandlerはrootだけに配置し、カテゴリ内部のAnimatedContentと状態Holderは削除しました。部品自体の展開アニメーションは維持します。
 
-旧Glyph 53e568cのtransitionSpecとレイアウトを抽出したfixtureを同じCompose版・テーマ・サイズで描画して比較します。旧ShutUp参照fixtureも履歴比較用に残しています。実測のフレーム・操作結果と未検証範囲は[検証記録](verification.md)を参照してください。
+旧Glyph 53e568cのtransitionSpecとレイアウトを抽出したfixtureを同じCompose版・テーマ・サイズで描画して比較します。旧ShutUp参照fixtureもAndroidTest内に保持します。実行方法は[検証ガイド](verification-guide.md)を参照してください。
 
-カタログのActivity再生成で起きた168pxのスクロールずれは、Window初期化と初回Insets配信の順序を修正しています。ライブラリは公式ScaffoldのInsetsと標準の状態保存を使用し、Window操作は利用側Activityの責務です。原因・計測・修正の範囲は[スクロール復元の調査記録](scroll-restoration.md)を参照してください。
+Activity再生成時はWindow初期化と初回Insets配信の順序に注意します。ライブラリは公式ScaffoldのInsetsと標準の状態保存を使用し、Window操作は利用側Activityの責務です。原因と対策は[スクロール復元](scroll-restoration-guide.md)を参照してください。
 
-2026-10-20の変更点とShutUp更新時の影響は[カードと標準遷移の拡充](details-cards-and-motion.md)を参照してください。既存の固定SHA依存は更新しない限り動作が変わりません。
+固定300ms tweenを使う旧版からの更新時は[カードと標準遷移](details-cards-and-motion.md)の注意点を確認してください。

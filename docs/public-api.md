@@ -59,7 +59,7 @@ PyriteThemeの公式テーマ間を移動する処理は互換adapterではな�
 
 ## 配布・検証
 
-依存版とMaven/JitPack構成は変更していません。独立consumerもこのAPIへ移行しています。現在の変更を含まない過去のJitPack SHAに対する互換性は提供しません。リモートで新APIを使うには、変更を公開後にその固定SHAを指定します。結果と未検証範囲は[verification.md](verification.md)を参照してください。
+この一覧は現在のソースに対応します。Maven/JitPackでは必要APIを含む公開済み固定SHAを指定してください。独立consumerとビルドの確認方法は[検証ガイド](verification-guide.md)を参照してください。
 
 ## 画面の共通構造
 

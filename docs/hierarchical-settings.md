@@ -41,4 +41,4 @@ Material 3 1.5.0-beta01の実sources JARではSwitch.ktを確認し、専用のM
 
 カタログの「階層型設定」から一覧→自動修正を開きます。一覧右Switchと詳細マスターは同じrememberSaveable値です。下位値も別に保存し、ON/OFF・明暗・M3E/Nothing・Activity再生成・往復後に維持します。callback回数を画面下へ表示します。
 
-MasterSwitchTestで背景ピクセルのON/OFF一致、下位の無効化と値保持、親/子Switchのノード数、カード／Switch位置のタップで1回だけ発火することを検証します。CatalogFlowTestで一覧詳細と再生成・テーマ変更の経路を確認します。実績はverification.mdを参照してください。TalkBack実機の読み上げは別途必要です。
+MasterSwitchTestで背景ピクセルのON/OFF一致、下位の無効化と値保持、親/子Switchのノード数、カード／Switch位置のタップで1回だけ発火することを検証します。CatalogFlowTestで一覧詳細と再生成・テーマ変更の経路を確認します。実行方法は[検証ガイド](verification-guide.md)を参照してください。TalkBack実機の読み上げは別途確認します。

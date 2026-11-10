@@ -22,9 +22,9 @@ SettingsGroupは可視行だけを収集し、一意のkeyでremember状態と�
 
 PyriteThemeはM3EとNothingで公式テーマの親構造が異なります。movableContentOfとrememberUpdatedStateで呼び出し側のcomposition identityと最新callbackを維持します。テーマ変更で保存値を初期化しません。
 
-PyriteThemeの入力はstyle / darkTheme / dynamicColor / contentです。形状・文字・固定パレットはライブラリで管理します。不要な互換APIは削除しました。現行APIと判断理由は[public-api.md](public-api.md)を参照してください。
+PyriteThemeの入力はstyle / darkTheme / dynamicColor / contentで、任意の[PyriteFonts](fonts.md)も指定できます。形状・文字階層・固定パレットはライブラリで管理します。現行APIと判断理由は[public-api.md](public-api.md)を参照してください。
 
-M3Eライトは選択中の公式Dynamic Colorまたは固定パレットからsurfaceContainerLowを背景、surfaceContainerLowestをPyrite共通カードへ使います。公式ColorSchemeのsurfaceContainerHighは変更せず、カード側の内部ヘルパーで選択します。明暗判定にはPyriteThemeのdarkThemeを内部CompositionLocalで渡し、色の明度から推測しません。公開引数は増やしていません。[B採用記録](reviews/m3e-light-2026-10-19/adoption.md)を参照してください。
+M3Eライトは作者が比較後に採用したB配色です。選択中の公式Dynamic Colorまたは固定パレットからsurfaceContainerLowを背景、surfaceContainerLowestをPyrite共通カードへ使い、背景より明るいカードを分離します。公式ColorSchemeのsurfaceContainerHighやprimary等は変更せず、カード側の内部ヘルパーで選択します。明暗判定にはPyriteThemeのdarkThemeを内部CompositionLocalで渡し、色の明度から推測しません。Nothingとダークは元の配色を維持し、候補A/Cの切替APIは設けません。M3SurfaceColorsTestでロールの割当を検証します。
 
 公式参照：
 

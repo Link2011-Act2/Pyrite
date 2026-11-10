@@ -14,6 +14,8 @@
 
 複数のAndroidアプリで共通利用する、Jetpack Composeの設定画面・About画面ライブラリです。
 
+ShutUp、NITTC Scheduler、Glyph Bartyで利用しています。
+
 - Android Library `:pyrite`：状態を外部から渡す設定UIとAbout表示。
 - UI検証カタログ `:app`：部品別の操作例、画面プレビュー、M3E／Nothing風の2スタイル、明暗、文字拡大と狭幅。
 - 独立した利用検証プロジェクト `verification/consumer`：発行済みMavenアーティファクトのみを参照。
@@ -61,13 +63,14 @@ implementation("jp.linkserver:pyrite:0.1.0-SNAPSHOT")
 
 AAR、ソースJAR、POM、Gradle Module Metadataを発行します。SNAPSHOTファイルにはタイムスタンプが付与され、Mavenメタデータから解決されます。
 
-利用する独立プロジェクトの`settings.gradle.kts`：
+利用する独立プロジェクトの`settings.gradle.kts`（Pyriteと利用側を隣接配置した例）：
 
 ```kotlin
 dependencyResolutionManagement {
     repositories {
         maven {
-            url = uri("D:/apps/pyrite/build/repository")
+            url = uri(providers.gradleProperty("pyrite.repository")
+                .getOrElse("../pyrite/build/repository"))
             content { includeGroup("jp.linkserver") }
         }
         google()
@@ -75,6 +78,8 @@ dependencyResolutionManagement {
     }
 }
 ```
+
+別の場所へ配置する場合は、`-Ppyrite.repository=...`で利用側プロジェクトからの相対パス、またはMavenリポジトリのURIを指定できます。
 
 利用側でもComposeを有効にし、対応するCompose Compiler pluginを適用してください。公開APIに必要なCompose UI / Foundation / Material 3は推移依存として提供します。ActivityやNavigationはアプリで選択します。
 
@@ -101,8 +106,6 @@ AARファイルだけをコピーする方法では推移依存情報が失わ�
 
 `jitpack.yml`でJDK 21・SDK 37と既存のMaven Publishを使用する構成を用意しています。公開座標の形式は`com.github.Link2011-Act2:Pyrite:<revision>`です。公開対象はライブラリAAR一つです。
 
-**JitPackの実ビルドと独立consumerの取得・ビルドに成功しました（2026-10-18）。** 検証済みの固定commitは`4244bed7b36aa084c89d14338f176dbf87c0f263`です。タグ・GitHub Releaseは作成していません。
-
 利用側の`settings.gradle.kts`の`repositories`へ追加：
 
 ```kotlin
@@ -115,21 +118,21 @@ maven {
 `app/build.gradle.kts`：
 
 ```kotlin
-implementation("com.github.Link2011-Act2:Pyrite:<current-api-commit-sha>")
+implementation("com.github.Link2011-Act2:Pyrite:<commit-sha>")
 ```
 
-公開確認済み4244bedは初期APIの証跡です。上のプレースホルダーには、現行APIを含むcommitを公開後にその固定SHAを指定してください。今回のAPI整理を含む変更はソース／ローカルMaven版で検証してください。
+`<commit-sha>`には、必要なAPIを含む公開済みコミットの固定SHAを指定してください。API一覧はこのチェックアウトのコードに対応します。採用するSHAで利用できるAPIと依存要件を確認してください。
 
 利用アプリ側でPyriteのソースを取得する必要はありません。SDK・Compose Compilerの要件は上記を参照してください。
 
 ```powershell
 # 専用ローカルMavenでJitPack座標とPOMの推移依存を検証
 .\scripts/verify-jitpack.ps1
-# 公開反映後、固定commit SHAまたは承認済み0.x.xタグで取得・ビルド
-.\scripts/verify-jitpack.ps1 -Revision '<current-api-commit-sha>'
+# 公開済みの固定commit SHAで取得・ビルド
+.\scripts/verify-jitpack.ps1 -Revision '<commit-sha>'
 ```
 
-利用側のリポジトリ設定、公開前の条件、クリーンビルドの手順は[配布ドキュメント](docs/distribution.md)を参照してください。[検証結果](docs/verification.md)に実施済み・未検証の範囲を記載しています。
+利用側のリポジトリ設定と配布構成は[配布ガイド](docs/distribution.md)、ビルド・回帰テストの方法は[検証ガイド](docs/verification-guide.md)を参照してください。
 
 ## 設定画面
 
@@ -201,8 +204,6 @@ SettingsChoiceDialog(
 
 ## 補足情報・状態・アクション
 
-以下の追加APIと標準Aboutモザイクは現在のソース／ローカルMaven版です。上記のJitPack検証済みSHAにはまだ含まれません。利用アプリへの導入は新しい固定SHAの公開・取得確認後に行います。
-
 ```kotlin
 SettingsSwitchItem(
     title = "自動維持",
@@ -234,7 +235,7 @@ AboutOverviewMosaicとAboutOverviewContentでChannel / Build / Versionを明示�
 
 既存の :app は、設定行／カード／ダイアログ／Aboutモザイク／画面プレビュー／公式コントロールを操作できるカタログです。カテゴリ内の右上でテーマ・明暗を切り替え、最初の設定画面で150%文字・360dp幅を選べます。状態は画面移動・テーマ切替・Activity再生成後も保持します。
 
-Pyriteが形状・余白・文字階層を管理します。アプリ別の意匠指定を増やさず、SchedulerのM3E／Glyph BartyのNothing風UIを基準に忠実に共通化します。元コード・差分は [移植記録](docs/source-port.md) を参照してください。検証条件と全公開UIの対応表は [カタログガイド](docs/catalog.md)、ShutUpの振る舞いを保つ手順は [移行計画](docs/shutup-migration-plan.md) を参照してください。
+Pyriteが形状・余白・文字階層を管理します。SchedulerのM3E／Glyph BartyのNothing風UIを基準に共通化しています。元コードと意図的な差分は[移植仕様](docs/source-port.md)、操作例は[カタログガイド](docs/catalog.md)、アプリの振る舞いを保つ導入・更新手順は[移行ガイド](docs/migration.md)を参照してください。
 
 ## About画面
 
@@ -289,36 +290,27 @@ TalkBackによる読み上げ全体と多様な端末・フォントでの確認
 
 | パッケージ | API |
 | --- | --- |
-| `theme` | `PyriteStyle`, `PyriteTheme` |
-| `settings` | `SettingsScreen`, `SettingsGroup`, `SettingsGroupScope.item`, `SettingsActionItem`, `SettingsSwitchItem`, `SettingsRadioItem`, `SettingsInfoItem`, `SettingsStatusItem`, `SettingsNavigationItem`, `SettingsRadioGroupItem`, `SettingsMasterSwitch`, `SettingsSplitSwitchItem` |
+| `theme` | `PyriteStyle`, `PyriteTheme`, `PyriteFonts` |
+| `screen` | `PyriteScreenScaffold`, `PyriteBackButton`, `PyriteScreenTransition`, `PyriteNavigationDirection` |
+| `settings` | `SettingsScreen`, `SettingsGroup`, `SettingsGroupScope.item`, `SettingsActionItem`, `SettingsSwitchItem`, `SettingsRadioItem`, `SettingsInfoItem`, `SettingsStatusItem`, `SettingsNavigationItem`, `SettingsRadioGroupItem`, `SettingsMasterSwitch`, `SettingsSplitSwitchItem`, `SettingsContentCard`, `SettingsSlider`, `SettingsSliderItem`, `SettingsButtonItem` |
 | `card` | `SettingsInfoCard`, `SettingsActionCard` |
 | `dialog` | `SettingsChoice<T>`, `SettingsChoiceDialog<T>` |
 | `about` | `AboutInfo`, `AboutDetail`, `AboutLink`, `AboutScreen`, `AboutOverviewMosaic`, `AboutOverviewContent`, `AboutAttribution`, `AboutAction`, `AboutActionGroup`, `AboutUpdateCard` |
 
-通常のButton、Card、Slider、Switch、LoadingIndicator等を再公開する独自ラッパーは用意していません。[APIの使い分けと削除対応表](docs/public-api.md)を参照してください。
+通常のButton、Card、Switch、LoadingIndicator等は公式APIを直接利用します。設定用のSlider・Buttonカードは[カードの仕様](docs/details-cards-and-motion.md)、フォント指定は[PyriteFonts](docs/fonts.md)、APIの使い分けは[公開APIガイド](docs/public-api.md)を参照してください。
 
 ## 検証
 
 ```powershell
-.\gradlew.bat :pyrite:testDebugUnitTest :pyrite:lintDebug :app:lintDebug
+.\gradlew.bat :pyrite:testDebugUnitTest :app:testDebugUnitTest :pyrite:lintRelease :app:lintDebug
 .\gradlew.bat :app:connectedDebugAndroidTest
 ```
 
-実行結果と検証範囲は`docs/verification.md`に記録します。接続先が複数ある場合、`ANDROID_SERIAL`でテスト対象を限定してください。
+テストの範囲、画像の出力先、Consumerの確認方法は[検証ガイド](docs/verification-guide.md)を参照してください。接続先が複数ある場合、`ANDROID_SERIAL`でテスト対象を限定してください。
 
-## 既存アプリへの導入・今後の範囲
+## 既存アプリへの導入・更新
 
-Glyph Barty、NITTC Scheduler、ShutUpは参照のみで、変更していません。導入時は依存整合→テーマ接続→設定行→Aboutの順に置き換え、既存の設定キー、ViewModel、権限・サービス・更新処理を維持します。
-
-今回の基盤以降の候補：
-
-1. 設定の数値・文字・時刻編集、検証・エラー表示。
-2. 展開可能な設定セクション（分割Switch行・マスターSwitchは実装済み）。
-3. データ外部指定のOSS一覧。アクション・状態カードは実装済みです。
-4. 公式FABメニュー・ツールバーとの接続例、状態モーフの薄い構成。
-5. Markdownなど追加依存が必要な表示の採否。
-
-公式APIで十分なものはサンプルや導入例で示し、独自公開APIを増やしません。詳細な公式API採否は`docs/design.md`を参照してください。
+導入時は依存整合→テーマ接続→設定行→Aboutの順に置き換え、既存の設定キー、ViewModel、権限・サービス・更新処理を維持します。固定SHA更新時の注意点も[移行ガイド](docs/migration.md)にまとめています。公式APIの採否は[設計方針](docs/design.md)を参照してください。
 
 ## ライセンス
 

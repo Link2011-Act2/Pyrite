@@ -23,4 +23,4 @@ PyriteTheme(
 
 カタログの外観設定に「カスタムフォント」を追加しました。SerifのtitleとMonospaceのaccentを設定し、本文は既定のままにします。スタイル・明暗・既存設定・画面状態の管理方法は維持します。
 
-検証記録は[font-verification.md](font-verification.md)を参照してください。
+未指定の役割には既定のFontFamilyを明示し、bodyだけの指定がChannelなどの強調値へ継承されないようにします。FontsUiTestは各役割のfamily・size・weight・lineHeight、未指定と空のPyriteFontsの画素一致を検査します。実行方法は[検証ガイド](verification-guide.md)を参照してください。

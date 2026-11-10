@@ -47,6 +47,6 @@ Aboutは左92dpアイコン・右アプリ情報の上段と、Channel／Build�
 
 補足slotへ親と競合する操作を入れず、独立操作には専用分割行・アクションカードを使ってください。可視行のkeyは一意・安定にします。
 
-元関数を抽出した比較fixtureはandroidTest内だけにあります。SourceParityTestが同条件の画像と差分を保存します。比較範囲と実績は[verification.md](verification.md)を参照してください。
+元関数を抽出した比較fixtureはandroidTest内だけにあります。SourceParityTestが同条件の画像と差分を生成します。比較範囲と実行方法は[検証ガイド](verification-guide.md)を参照してください。
 
 設定→About→「導入方法」からビルド情報詳細を開けます。進む／戻るのスライド、スクロール・表示設定の復元、連続した画面操作とActivity再生成を確認してください。カテゴリ内にも別の画面遷移ホストを置く構成は廃止しました。

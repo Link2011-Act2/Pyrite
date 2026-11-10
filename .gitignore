@@ -26,3 +26,37 @@
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Local AI agent instructions and settings
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+GEMINI.md
+.agents/
+.ai-local/
+.claude/
+.codex/
+.cursor/
+.cursorrules
+.github/copilot-instructions.md
+.github/instructions/
+.github/agents/
+
+# Temporary plans, handoffs, and generated review artifacts
+/docs/handoff*.md
+/docs/*-migration-plan.md
+/docs/work-notes*.md
+/docs/reviews/
+/docs/verification.md
+/docs/font-verification.md
+/docs/scroll-restoration.md
+/verification/artifacts/
+/verification/logs/
+*.log
+
+# Local editor and machine configuration
+.vscode/
+.env
+.env.*
+!.env.example
+!.env.sample

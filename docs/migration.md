@@ -1,64 +1,51 @@
-# 既存アプリへの導入計画
+# 既存アプリへの導入・更新
 
-既存のGlyph Barty・NITTC Scheduler・ShutUpは変更していません。この文書は、各アプリ側の変更許可を得た後の手順です。
+PyriteはShutUp、NITTC Scheduler、Glyph Bartyで利用されています。ここでは新しいアプリへの導入と、固定SHAを更新する際の確認事項をまとめます。
 
-## 標準デザインを採用
+## 依存とテーマ
 
-既存のScheduler M3E・Glyph Nothingを忠実に共通化します。ShutUpのAbout帰属・更新カードも移植します。外観の自由指定APIは追加せず、状態と操作callbackをホストに残します。詳細は[source-port.md](source-port.md)と[shutup-migration-plan.md](shutup-migration-plan.md)を参照してください。導入はカタログ確認後の別途指示を待ちます。
+1. [README](../README.md)のSDK・JDK・Compose要件を確認し、必要APIを含む固定SHAのMaven依存を追加します。取得方法は[配布ガイド](distribution.md)を参照してください。
+2. 利用側の解決済み依存を確認し、古いComposeやMaterial 3への強制固定を解消します。Compose CompilerとAGPの組み合わせも利用側でビルド確認します。
+3. ホストが所有するテーマ状態から`PyriteStyle`・`darkTheme`・`dynamicColor`を渡します。Glyph由来のNothing風、Scheduler由来のM3E、ShutUp由来のAbout構造と意図的な差分は[source-port.md](source-port.md)を参照してください。
 
-今回追加したAPIは既存のJitPack検証済みSHAには含まれません。導入前に必要APIを含む固定SHAの公開取得を確認します。
+Pyriteのソース、隣接チェックアウト、ローカルMavenは通常の利用に不要です。再現性が必要な依存には可変の`master-SNAPSHOT`ではなく固定SHAを使います。targetSdkや関連しないライブラリは、UI導入と合わせて機械的に変更しないでください。
 
-## ビルドの前提
+## UIの置き換え
 
-PyriteはMaterial 3 1.5.0-beta01 / Compose 1.12.0を使用します。依存関係にはcompileSdk 37 / AGP 9.1.0以上が必要です。利用側の最終的な依存解決結果を確認し、古いComposeやMaterial 3への強制固定を解消します。今回の独立consumer検証はAGP 9.4.1で実施します。
-
-| アプリ | 現在のcompileSdk | 導入時の検討 |
-| --- | --- | --- |
-| Glyph Barty | 36.1 | compileSdk 37、Compose/M3依存整合、Nothing風テーマ接続 |
-| NITTC Scheduler | 37 | beta01へのAPI互換性確認。未コミットの設定UI調整を保持 |
-| ShutUp | 36 | compileSdk 37、M3 alpha10からbeta01への依存・API整合 |
-
-targetSdkの変更はこの導入計画に含めません。Kotlin/Compose Compiler/AGPの組み合わせは利用側でもビルド確認します。
-
-## 置き換える範囲
-
-1. Maven座標を追加し、最小の設定画面で依存整合を確認。
-2. ホストが所有するテーマ状態からPyriteStyleとdarkThemeを渡す。
-3. 設定項目をSettingsGroupとSettingsActionItem/SettingsSwitchItem/SettingsRadioItemへ置換。
-4. アプリが取得した情報をAboutInfo/Detail/Linkに変換し、About表示を置換。
-5. 設定キー・保存形式・権限・通知・サービス・更新・ログ機能を維持して回帰確認。
-
-| 元の実装 | Pyriteの候補 |
+| 元の構造 | PyriteのAPI |
 | --- | --- |
-| Glyph SettingsEntry / SettingsToggleEntry | SettingsActionItem / SettingsSwitchItem |
-| Glyph SettingsRadioEntry | SettingsRadioGroupItem。ダイアログが必要な場合のみSettingsChoiceDialog |
-| Scheduler AppSettingsSwitchItem / AppSettingsNavigationItem | SettingsSwitchItem / SettingsActionItem |
-| ShutUpの繰り返されるSwitch設定行 | SettingsSwitchItem |
-| 各アプリのAboutモザイク | AboutOverviewMosaic、またはAboutScreen全体の表示部分 |
+| 設定の遷移行 / 切替行 | `SettingsNavigationItem` / `SettingsSwitchItem` |
+| 説明と複数のRadio候補 | `SettingsRadioGroupItem` |
+| 確定・取消のある単一選択 | `SettingsChoiceDialog`。下書きはホストが管理 |
+| 遷移とSwitchが独立した行 | `SettingsSplitSwitchItem` |
+| 詳細画面全体のON/OFF | `SettingsMasterSwitch`。下位のenabledはホストが渡す |
+| Slider・独立Buttonを含む連結カード | `SettingsSliderItem` / `SettingsButtonItem` / `SettingsContentCard` |
+| Aboutモザイク / 帰属 / 更新結果 | `AboutOverviewMosaic` / `AboutAttribution` / `AboutUpdateCard` |
+| 共通ヘッダー / 画面遷移 | `PyriteScreenScaffold` / `PyriteScreenTransition` |
 
-単なるButton/Card/Slider等は公式APIを維持します。遷移とSwitchが独立した複合行はSettingsSplitSwitchItem、詳細のマスターはSettingsMasterSwitchを使えます。下位のenabledはホストが渡します。画面全体を機械的にコピー・置換しないでください。
-
-## beta01固有の注意
-
-公式配布ソースで必要なAPIを照合しています。beta01はalpha25のソース互換性を一律に保証するものではありません。
-
-- Pyriteはbeta01のMaterialExpressiveTheme / MotionScheme / Switchを使用。元のSurface/Rowを維持するためSegmentedListItemへ置換しません。
-- Sliderのサンプルは、旧value引数版を避け、SliderStateとonValueChangeを使う公開APIへ更新。
-- Typographyのフォント指定はfontFamily引数。
-- beta01ソースには公開SplitButtonLayoutがあります。SchedulerのSplitButton呼び出しは、アプリ導入時に採用版のAPIへ合わせて照合・調整が必要です。
-- ButtonGroup、FAB menu、floating toolbar、LoadingIndicator、MaterialShapes/toPath/toShapeはbeta01の公開ソースで存在を確認済みです。初期版のPyrite独自APIにはせず、公式APIを必要に応じて直接利用します。
-
-既存アプリ自体のbeta01移行ビルドは、変更禁止のため実行していません。
-
-## 保持するもの
-
-GlyphのSettingsPreferencesのキー、SchedulerのRoom・同期・通知・カレンダー、ShutUpのViewModel・Shizuku・端末固有処理はアプリ側に残します。URL起動、PackageManager/BuildConfig、更新チェック、OSS一覧生成もホストの責務です。
-
-Nothing所有のNdot/NTypeフォントはPyriteへコピーしません。既存アプリでの取り扱いは別途確認事項とし、今回の作業で既存ファイルを変更しません。
-
-既存のSettingsScreen/AboutScreenと名前が衝突する場合は、import aliasで呼び分けます。
+表示される項目だけを`SettingsGroup.item`に安定した一意のキーで登録します。通常のButton・Cardなどは公式APIを直接利用します。Scaffoldと画面遷移ホストを二重にしないでください。既存画面と名前が衝突する場合はimport aliasを使えます。
 
 ```kotlin
 import jp.linkserver.pyrite.settings.SettingsScreen as PyriteSettingsScreen
 import jp.linkserver.pyrite.about.AboutScreen as PyriteAboutScreen
 ```
+
+## ホストで維持する契約
+
+- 設定キー・保存形式・ViewModel/StateFlowを維持し、確定値をUIの別Booleanへ複製しません。確認ダイアログには下書きだけを保持します。
+- ON/OFFと実際の稼働状態は分けます。ShutUpの自動維持のようにONのまま一時停止できる場合は、補足slotや`SettingsStatusItem`へ状態を渡します。
+- 端末判定、権限、サービス、確認・復元ガード、保存失敗時の処理はアプリ側に残します。確認が必要なONは確定後だけ保存し、取消では保存しません。
+- 各行の表示・無効条件を個別に維持します。開発者限定項目や模擬環境の条件を、通常項目へ広げないでください。
+- 更新確認の重複防止、キャンセルの伝播、取得間隔・無視した版、結果通知、URL失敗時の処理を維持します。通信や更新ファイル管理はPyriteの責務ではありません。
+- 上流リンク・帰属・OSSライセンスを維持します。PyriteのMIT本文とNOTICEはAARの`META-INF/pyrite/`に同梱されます。
+- Ndot/NTypeはPyriteに同梱しません。権利を確認した利用アプリが管理し、[PyriteFonts](fonts.md)で役割ごとに渡します。
+
+## 更新時の回帰確認
+
+設定行・Aboutを段階的に置き換え、既存の保存・権限・通知・サービス・更新テストを維持します。Pyriteソースに依存しないアプリ単独のビルドでも取得を確認してください。
+
+画面遷移はGlyph由来のCompose標準springです。固定300msを前提とするテストはアニメーション完了を待つ形にします。[画面遷移](navigation.md)と[カードの仕様](details-cards-and-motion.md)を参照してください。
+
+Activity再生成時はWindowの初期化とInsets配信の順序に注意します。スクロールの保存値だけでなくviewportと末端位置も確認してください。[スクロール復元](scroll-restoration-guide.md)に原因と対策があります。
+
+明暗・Dynamic Color、文字拡大・狭幅、戻る・再生成、更新の成功/失敗/取消、保存失敗を利用アプリでも確認します。Pyriteの[検証ガイド](verification-guide.md)はアプリ固有の回帰テストを代替しません。

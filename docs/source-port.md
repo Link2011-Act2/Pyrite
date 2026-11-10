@@ -1,12 +1,12 @@
-# 既存UIの忠実な移植（2026-10-18）
+# 既存UIの移植仕様
 
-この文書を、従来の「Pyrite独自標準デザインへ変更する」方針より優先します。対象はM3EとNothing風の2種類です。通常Material 3の独立したenum値は削除しました。テーマの形状・余白・文字はPyriteで管理し、互換用のoverride引数は削除しました。
+対象はM3EとNothing風の2種類です。テーマの形状・余白・文字階層はPyriteで管理します。書体は[PyriteFonts](fonts.md)で役割ごとに指定できます。
 
-2026-10-19追記：ユーザーが選択した[B配色](reviews/m3e-light-2026-10-19/adoption.md)をM3Eライトへ適用しています。背景はsurfaceContainerLow、共通カードはsurfaceContainerLowestです。元アプリとの差分として明示し、形状・文字・動作、Nothingおよびダーク配色は維持します。SourceParityTestはこの承認済みライト配色だけを参照描画へ適用して、元の寸法・配置を比較します。
+M3Eライトには作者が選択したB配色を適用しています。背景はsurfaceContainerLow、共通カードはsurfaceContainerLowestです。元アプリとの差分として明示し、形状・文字・動作、Nothingおよびダーク配色は維持します。SourceParityTestはこの採用済みライト配色だけを参照描画へ適用して、元の寸法・配置を比較します。判断理由は[設計方針](design.md)を参照してください。
 
-## 再調査と移植対象
+## 移植元と採用内容
 
-元パスの基点は各リポジトリのapp/src/main/javaです。3アプリのソースは読み取りのみです。
+元パスの基点は各リポジトリのapp/src/main/javaです。以下は共通UIの移植元であり、現在は3アプリともPyriteを利用しています。
 
 | 対象 | 元ファイル | 元の特徴と採用内容 |
 | --- | --- | --- |
@@ -19,7 +19,7 @@
 | ShutUp About | jp/linkserver/shutter/ui/AboutOverview.kt, AboutScreen.kt | Glyph由来の共通構造。Forked from、上流リンク、更新説明・仕切り・結果・確認ボタン、連結アクションカードを追加 |
 | ShutUp設定 | jp/linkserver/shutter/ui/SettingsComponents.kt, AutoMaintainSettingsSection.kt, GalaxyControlSettingsSection.kt, DeveloperUpdateSettingsSection.kt | 連結設定行・説明・有効条件の共通構造を確認。環境判定・確認ガード・保存・ViewModelは移植しない |
 
-参照HEADはGlyph 53e568c、Scheduler 26913ba、ShutUp 34241e9です。SchedulerのSettingsScreen / AppSettingsComponents等には調査開始時点から未コミット変更があり、その実装も基準にしています。NOTICE.mdに帰属を保持します。
+移植時の参照コミットはGlyph 53e568c、Scheduler 26913ba、ShutUp 34241e9です。比較に使う抽出ソースはAndroidTest内に保持し、NOTICE.mdに帰属を記載します。
 
 ## Aboutの構造
 
@@ -69,4 +69,4 @@ SettingsInfoCard / SettingsActionCardは説明・補足slot・進行中の設定
 
 app/src/androidTest/.../referenceは元関数の抽出fixtureです。package・関数名、アプリ資源参照、元テーマのモード参照のみをテスト用に置換します。Aboutのアイコンは両側同じ仮アイコン、制限付きフォントは両側同じシステムフォントです。ライブラリ本体・公開AARへfixtureは入りません。
 
-SourceParityTestで360dp・fontScale 1・明暗を揃え、Scheduler M3EとGlyph NothingのAboutとSwitch、Glyphの連結遷移行を撮影し、ピクセル差分を保存します。これは元Composableとの比較であり、元アプリのAPK全体を同時実行した比較ではありません。文言・アセット・アプリ固有状態まで一致したと誤解しないでください。最終結果と未検証範囲はverification.mdへ記録します。
+SourceParityTestで360dp・fontScale 1・明暗を揃え、Scheduler M3EとGlyph NothingのAboutとSwitch、Glyphの連結遷移行を撮影し、ピクセル差分を保存します。比較対象は抽出した元Composableで、文言・アセット・アプリ固有状態を含む元APK全体ではありません。実行方法は[検証ガイド](verification-guide.md)を参照してください。
